@@ -11,7 +11,7 @@ is_mock_mode = not api_key
 if not is_mock_mode:
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel(
-        model_name="gemini-1.5-pro",
+        model_name="gemini-1.5-flash",
         generation_config={
             "response_mime_type": "application/json"
         }
