@@ -10,6 +10,15 @@ load_dotenv()
 
 app = FastAPI(docs_url="/api/python/docs", openapi_url="/api/python/openapi.json")
 
+@app.get("/api/python/debug")
+async def debug_gemini():
+    try:
+        import os
+        key = os.getenv("GEMINI_API_KEY", "")
+        return {"key_prefix": key[:4]}
+    except Exception as e:
+        return {"error": str(e)}
+
 @app.post("/api/python/upload")
 async def upload_pdf(file: UploadFile = File(...)):
     if not file.filename.endswith(".pdf"):

@@ -92,6 +92,8 @@ Here is the source text limit to the first 30000 characters for token limits:
         return data
     except Exception as e:
         error_msg = str(e)
+        import traceback
+        traceback.print_exc()
         print(f"Error calling Gemini or parsing: {error_msg}")
         if "API_KEY_INVALID" in error_msg or "API key not valid" in error_msg:
             raise ValueError("The GEMINI_API_KEY entered in Vercel is invalid. Please double-check it in your Vercel Environment Variables.")
