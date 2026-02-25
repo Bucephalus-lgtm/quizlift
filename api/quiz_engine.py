@@ -85,5 +85,8 @@ Here is the source text limit to the first 30000 characters for token limits:
         data = json.loads(response.text)
         return data
     except Exception as e:
-        print(f"Error parsing Gemini response: {e}")
-        raise ValueError("Failed to generate valid JSON from AI. Did you provide a valid API key?")
+        error_msg = str(e)
+        print(f"Error calling Gemini or parsing: {error_msg}")
+        if "API_KEY_INVALID" in error_msg or "API key not valid" in error_msg:
+            raise ValueError("The GEMINI_API_KEY entered in Vercel is invalid. Please double-check it in your Vercel Environment Variables.")
+        raise ValueError(f"Failed to generate valid JSON from AI. Error: {error_msg}")

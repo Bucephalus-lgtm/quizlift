@@ -61,9 +61,14 @@ export function QuizEngine() {
             if (res.data?.status === "success") {
                 setQuizData(res.data.quiz);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to generate quiz", error);
-            alert("Error generating quiz. Is the backend running and API key set?");
+            const serverError = error.response?.data?.detail;
+            if (serverError) {
+                alert(`API Error: ${serverError}`);
+            } else {
+                alert("Error generating quiz. Is the backend running and API key set? Try again.");
+            }
         } finally {
             setLoading(false);
         }
@@ -143,7 +148,7 @@ export function QuizEngine() {
                         )}
                     </span>
                 </div>
-                <Progress value={progressVal} className="h-2 mb-8 bg-neutral-800" indicatorclass="bg-indigo-500" />
+                <Progress value={progressVal} className="h-2 mb-8 bg-neutral-800" indicatorClass="bg-indigo-500" />
 
                 <AnimatePresence mode="wait">
                     <motion.div
