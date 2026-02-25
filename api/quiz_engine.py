@@ -11,9 +11,9 @@ is_mock_mode = not api_key
 if not is_mock_mode:
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
+        model_name="gemini-1.5-flash-latest",
         generation_config={
-            "response_mime_type": "application/json"
+            "temperature": 0.2
         }
     )
 
@@ -82,7 +82,13 @@ Here is the source text limit to the first 30000 characters for token limits:
 
     try:
         response = model.generate_content(prompt)
-        data = json.loads(response.text)
+        text_resp = response.text.strip()
+        if text_resp.startswith("```json"):
+            text_resp = text_resp[7:]
+        if text_resp.endswith("```"):
+            text_resp = text_resp[:-3]
+        text_resp = text_resp.strip()
+        data = json.loads(text_resp)
         return data
     except Exception as e:
         error_msg = str(e)
