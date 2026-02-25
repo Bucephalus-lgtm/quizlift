@@ -11,7 +11,7 @@ is_mock_mode = not api_key
 if not is_mock_mode:
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel(
-        model_name="gemini-pro",
+        model_name="gemini-2.5-flash",
         generation_config={
             "temperature": 0.2
         }

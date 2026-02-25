@@ -10,21 +10,6 @@ load_dotenv()
 
 app = FastAPI(docs_url="/api/python/docs", openapi_url="/api/python/openapi.json")
 
-@app.get("/api/python/debug")
-async def debug_gemini():
-    try:
-        import os
-        import google.generativeai as genai
-        key = os.getenv("GEMINI_API_KEY", "")
-        genai.configure(api_key=key)
-        models = []
-        for m in genai.list_models():
-            if 'generateContent' in m.supported_generation_methods:
-                models.append(m.name)
-        return {"key_prefix": key[:4], "available_models": models}
-    except Exception as e:
-        return {"error": str(e)}
-
 @app.post("/api/python/upload")
 async def upload_pdf(file: UploadFile = File(...)):
     if not file.filename.endswith(".pdf"):
