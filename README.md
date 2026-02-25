@@ -2,11 +2,17 @@
 
 **QuizLift** is a high-performance AI platform designed to bridge the gap between passive reading and active recall. By transforming static PDF documents into dynamic, multi-modal assessment modules, QuizLift empowers users to validate their understanding of complex materials in real-time.
 
+![Landing Page - PDF Upload](./public/initial_state.png)
+
+
 ## 🧠 Advanced AI Logic: Beyond Simple Extraction
 Unlike standard Q&A systems, QuizLift utilizes a dual-engine questioning strategy powered by **Google Gemini 1.5/2.5**:
 
 *   **Direct Semantic Mapping:** Challenges the user with questions directly derived from the document's explicit text for foundational verification.
 *   **Conceptual "In & Around" Logic:** Synthesizes the document's core themes to generate questions about related concepts and logical extensions, ensuring a deep conceptual grasp rather than mere rote memorization.
+
+![Interactive Quiz Interface](./public/quiz_state.png)
+
 
 ## ✨ Core Features
 1.  **Seamless PDF Ingestion:** Instantly process dense reading materials, lecture slides, or technical documentation via a drag-and-drop interface.
