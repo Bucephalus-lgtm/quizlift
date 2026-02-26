@@ -125,10 +125,10 @@ export function QuizEngine() {
             <Card className="w-full max-w-2xl mx-auto bg-neutral-900 border-neutral-800 text-neutral-100 shadow-xl overflow-hidden glassmorphism">
                 <CardContent className="flex flex-col items-center p-12 space-y-8">
                     <Brain className="w-24 h-24 text-indigo-400" />
-                    <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-indigo-500">
+                    <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-indigo-500">
                         Quiz Completed!
                     </h2>
-                    <div className="text-2xl">
+                    <div className="text-xl">
                         You scored <span className="font-bold text-emerald-400">{finalScore}</span> out of {quizData.length}
                     </div>
                     <Button onClick={resetQuiz} className="bg-indigo-600 hover:bg-indigo-700 w-full max-w-sm mt-4">
@@ -169,13 +169,13 @@ export function QuizEngine() {
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
                     >
-                        <Card className="bg-neutral-900/50 backdrop-blur-xl border-neutral-800 text-neutral-100 shadow-2xl p-6 relative group overflow-hidden">
+                        <Card className="bg-neutral-900/50 backdrop-blur-xl border-neutral-800 text-neutral-100 shadow-2xl p-5 md:p-8 relative group overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none" />
-                            <CardTitle className="text-2xl leading-relaxed mb-6">
+                            <CardTitle className="text-xl leading-relaxed mb-6 font-semibold">
                                 {q.question}
                             </CardTitle>
 
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                                 {q.options.map((opt, idx) => {
                                     let buttonStateClass = "bg-neutral-800 border-neutral-700 hover:bg-neutral-700 hover:border-neutral-500";
 
@@ -199,9 +199,9 @@ export function QuizEngine() {
                                                 buttonStateClass
                                             )}
                                         >
-                                            <span className="font-medium">{opt.text}</span>
-                                            {showExplanation && opt.is_correct && <CheckCircle2 className="text-emerald-500" />}
-                                            {showExplanation && !opt.is_correct && idx === selectedOption && <XCircle className="text-red-500" />}
+                                            <span className="font-medium text-sm md:text-base">{opt.text}</span>
+                                            {showExplanation && opt.is_correct && <CheckCircle2 className="text-emerald-500 w-5 h-5" />}
+                                            {showExplanation && !opt.is_correct && idx === selectedOption && <XCircle className="text-red-500 w-5 h-5" />}
                                         </button>
                                     );
                                 })}
@@ -213,10 +213,10 @@ export function QuizEngine() {
                                     animate={{ opacity: 1, height: "auto" }}
                                     className="mt-6 p-5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-100"
                                 >
-                                    <div className="flex items-center gap-2 mb-2 font-bold text-indigo-300">
-                                        <Brain className="w-5 h-5" /> Learn More:
+                                    <div className="flex items-center gap-2 mb-2 font-bold text-indigo-300 text-sm">
+                                        <Brain className="w-4 h-4" /> Learn More:
                                     </div>
-                                    <p className="leading-relaxed text-sm md:text-base">{q.explanation}</p>
+                                    <p className="leading-relaxed text-sm">{q.explanation}</p>
                                 </motion.div>
                             )}
 
@@ -251,15 +251,15 @@ export function QuizEngine() {
             <div
                 {...getRootProps()}
                 className={cn(
-                    "border-2 border-dashed rounded-3xl p-12 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group",
+                    "border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group",
                     isDragActive ? "border-indigo-400 bg-indigo-400/10 scale-105" : "border-neutral-700 bg-neutral-900 hover:border-indigo-500 hover:bg-neutral-800"
                 )}
             >
                 <input {...getInputProps()} />
-                <div className="p-4 rounded-full bg-neutral-800 group-hover:bg-indigo-500/20 mb-4 transition-colors">
-                    <UploadCloud className="w-10 h-10 text-neutral-400 group-hover:text-indigo-400 transition-colors" />
+                <div className="p-3 rounded-full bg-neutral-800 group-hover:bg-indigo-500/20 mb-3 transition-colors">
+                    <UploadCloud className="w-8 h-8 text-neutral-400 group-hover:text-indigo-400 transition-colors" />
                 </div>
-                <p className="text-xl font-medium text-neutral-300 text-center">
+                <p className="text-lg font-medium text-neutral-300 text-center">
                     {isDragActive ? "Drop the document here..." : "Drag & drop your study material (PDF, DOCX, DOC)"}
                 </p>
                 <p className="text-sm text-neutral-500 mt-2">Maximum file size: 10MB.</p>
@@ -280,7 +280,7 @@ export function QuizEngine() {
                     <select
                         value={quizType}
                         onChange={(e) => setQuizType(e.target.value)}
-                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer"
+                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer"
                     >
                         <option value="mix">Balanced Mix (Default)</option>
                         <option value="text_based">Strictly Fact-Based</option>
@@ -298,7 +298,7 @@ export function QuizEngine() {
                         max={50}
                         value={numQuestions}
                         onChange={(e) => setNumQuestions(Math.min(50, Math.max(1, parseInt(e.target.value) || 1)))}
-                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                     />
                 </div>
             </div>
@@ -308,9 +308,9 @@ export function QuizEngine() {
                     disabled={!file}
                     onClick={handleGenerateQuiz}
                     size="lg"
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-lg font-bold px-12 py-7 shadow-lg shadow-indigo-500/25 transition-all transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none rounded-2xl"
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-base font-bold px-10 py-6 mb-6 shadow-lg shadow-indigo-500/25 transition-all transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none rounded-xl"
                 >
-                    <Brain className="mr-3 w-6 h-6" /> Generate Magic Quiz
+                    <Brain className="mr-2 w-5 h-5" /> Generate Magic Quiz
                 </Button>
             </div>
         </div>
