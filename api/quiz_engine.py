@@ -109,3 +109,54 @@ Here is the source text limit to the first 30000 characters for token limits:
         if "API_KEY_INVALID" in error_msg or "API key not valid" in error_msg:
             raise ValueError("The GEMINI_API_KEY entered in Vercel is invalid. Please double-check it in your Vercel Environment Variables.")
         raise ValueError(f"Failed to generate valid JSON from AI. Error: {error_msg}")
+
+def generate_current_affairs_quiz(num_questions: int = 10) -> dict:
+    if is_mock_mode:
+        print("MOCK MODE: Returning dummy quiz due to missing GEMINI_API_KEY")
+        mock = _get_mock_quiz()
+        return {"questions": mock["questions"][:num_questions]}
+
+    prompt = f"""
+You are an expert educator and quiz master for Indian government exams.
+Your task is to generate exactly {num_questions} multiple-choice questions (MCQs) covering recent Current Affairs from major Indian news headlines that are highly important for government and civil service exams.
+
+Requirements:
+1. Questions must cover diverse topics like National News, International Relations, Economy, Environment, and Science & Tech.
+2. Each question must have exactly 4 options, with exactly 1 correct option.
+3. Provide a detailed explanation for the correct answer, which will be shown in a "Learn More" section.
+4. You MUST return the output as a valid JSON object matching this schema:
+{{
+  "questions": [
+    {{
+      "question": "The question text",
+      "options": [
+        {{"text": "Option A", "is_correct": false}},
+        {{"text": "Option B", "is_correct": true}},
+        {{"text": "Option C", "is_correct": false}},
+        {{"text": "Option D", "is_correct": false}}
+      ],
+      "explanation": "Detailed explanation of why B is correct, including context.",
+      "type": "current_affairs"
+    }}
+  ]
+}}
+    """
+
+    try:
+        response = model.generate_content(prompt)
+        text_resp = response.text.strip()
+        if text_resp.startswith("```json"):
+            text_resp = text_resp[7:]
+        if text_resp.endswith("```"):
+            text_resp = text_resp[:-3]
+        text_resp = text_resp.strip()
+        data = json.loads(text_resp)
+        return data
+    except Exception as e:
+        error_msg = str(e)
+        import traceback
+        traceback.print_exc()
+        print(f"Error calling Gemini or parsing: {error_msg}")
+        if "API_KEY_INVALID" in error_msg or "API key not valid" in error_msg:
+            raise ValueError("The GEMINI_API_KEY entered in Vercel is invalid. Please double-check it in your Vercel Environment Variables.")
+        raise ValueError(f"Failed to generate valid JSON from AI. Error: {error_msg}")

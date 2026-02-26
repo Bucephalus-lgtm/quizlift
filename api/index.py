@@ -1,7 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pypdf import PdfReader
-from .quiz_engine import generate_quiz_from_text
+from .quiz_engine import generate_quiz_from_text, generate_current_affairs_quiz
 import io
 import os
 from dotenv import load_dotenv
@@ -50,6 +50,21 @@ async def upload_document(
             raise HTTPException(status_code=400, detail="Could not extract readable text from the document.")
         
         quiz_data = generate_quiz_from_text(text, num_questions=num_questions, quiz_type=quiz_type)
+        return {"status": "success", "quiz": quiz_data["questions"]}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/python/generate_current_affairs")
+async def get_current_affairs(
+    num_questions: int = Form(10)
+):
+    if num_questions < 1 or num_questions > 50:
+         raise HTTPException(status_code=400, detail="Number of questions must be between 1 and 50.")
+    
+    try:
+        quiz_data = generate_current_affairs_quiz(num_questions=num_questions)
         return {"status": "success", "quiz": quiz_data["questions"]}
     except Exception as e:
         import traceback

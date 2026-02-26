@@ -52,17 +52,25 @@ export function QuizEngine() {
     });
 
     const handleGenerateQuiz = async () => {
-        if (!file) return;
         setLoading(true);
         try {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("quiz_type", quizType);
-            formData.append("num_questions", numQuestions.toString());
+            let res;
+            if (file) {
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("quiz_type", quizType);
+                formData.append("num_questions", numQuestions.toString());
 
-            const res = await axios.post("/api/python/upload", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
+                res = await axios.post("/api/python/upload", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+            } else {
+                const formData = new FormData();
+                formData.append("num_questions", numQuestions.toString());
+                res = await axios.post("/api/python/generate_current_affairs", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+            }
 
             if (res.data?.status === "success") {
                 setQuizData(res.data.quiz);
@@ -112,8 +120,8 @@ export function QuizEngine() {
         return (
             <div className="flex flex-col items-center justify-center py-24 space-y-6">
                 <Loader2 className="w-16 h-16 animate-spin text-indigo-500" />
-                <h3 className="text-xl font-medium text-neutral-300">Summoning AI capabilities to read your document...</h3>
-                <p className="text-neutral-500">Generating contextual MCQs with "In and Around" variations.</p>
+                <h3 className="text-xl font-medium text-neutral-300">Summoning AI capabilities...</h3>
+                <p className="text-neutral-500">Generating contextual MCQs to test your knowledge.</p>
             </div>
         );
     }
@@ -275,12 +283,13 @@ export function QuizEngine() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-neutral-900/50 p-6 rounded-3xl border border-neutral-800 backdrop-blur-sm">
                 <div className="space-y-3">
                     <label className="text-sm font-semibold text-neutral-400 ml-1 flex items-center gap-2">
-                        <BookOpen size={16} /> Quiz Strategy
+                        <BookOpen size={16} /> Quiz Strategy {(!file) && "(Disabled w/o Doc)"}
                     </label>
                     <select
                         value={quizType}
+                        disabled={!file}
                         onChange={(e) => setQuizType(e.target.value)}
-                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer"
+                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer disabled:opacity-50"
                     >
                         <option value="mix">Balanced Mix (Default)</option>
                         <option value="text_based">Strictly Fact-Based</option>
@@ -305,12 +314,11 @@ export function QuizEngine() {
 
             <div className="flex justify-center pt-2">
                 <Button
-                    disabled={!file}
                     onClick={handleGenerateQuiz}
                     size="lg"
                     className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-base font-bold px-10 py-6 mb-6 shadow-lg shadow-indigo-500/25 transition-all transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none rounded-xl"
                 >
-                    <Brain className="mr-2 w-5 h-5" /> Generate Magic Quiz
+                    <Brain className="mr-2 w-5 h-5" /> {file ? "Generate Magic Quiz" : "Generate Current Affairs Quiz"}
                 </Button>
             </div>
         </div>
