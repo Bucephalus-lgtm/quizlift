@@ -178,13 +178,13 @@ export function QuizEngine() {
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
                     >
-                        <Card className="bg-neutral-900/50 backdrop-blur-xl border-neutral-800 text-neutral-100 shadow-2xl p-5 md:p-8 relative group overflow-hidden">
+                        <Card className="bg-neutral-900/50 backdrop-blur-xl border-neutral-800 text-neutral-100 shadow-2xl p-4 md:p-6 relative group overflow-hidden">
                             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none" />
-                            <CardTitle className="text-xl leading-relaxed mb-6 font-semibold">
+                            <CardTitle className="text-lg md:text-xl leading-relaxed mb-4 font-semibold">
                                 {q.question}
                             </CardTitle>
 
-                            <div className="space-y-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {q.options.map((opt, idx) => {
                                     let buttonStateClass = "bg-neutral-800 border-neutral-700 hover:bg-neutral-700 hover:border-neutral-500";
 
@@ -204,7 +204,7 @@ export function QuizEngine() {
                                             disabled={showExplanation}
                                             onClick={() => handleOptionSelect(idx, opt.is_correct)}
                                             className={cn(
-                                                "w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-between group-hover:shadow-md",
+                                                "w-full text-left p-3 rounded-xl border-2 transition-all duration-200 flex items-start gap-2 justify-between group-hover:shadow-md",
                                                 buttonStateClass
                                             )}
                                         >
@@ -220,7 +220,7 @@ export function QuizEngine() {
                                 <motion.div
                                     initial={{ opacity: 0, height: 0 }}
                                     animate={{ opacity: 1, height: "auto" }}
-                                    className="mt-6 p-5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-100"
+                                    className="mt-4 p-4 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-100"
                                 >
                                     <div className="flex items-center gap-2 mb-2 font-bold text-indigo-300 text-sm">
                                         <Brain className="w-4 h-4" /> Learn More:
@@ -234,14 +234,14 @@ export function QuizEngine() {
                                     onClick={prevQuestion}
                                     disabled={currentQuestionIdx === 0}
                                     variant="outline"
-                                    className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white flex items-center gap-2 px-6"
+                                    className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white flex items-center gap-2 px-4 md:px-6"
                                 >
                                     <ArrowLeft className="w-4 h-4 mr-1" /> Previous
                                 </Button>
                                 <Button
                                     onClick={nextQuestion}
                                     disabled={!showExplanation}
-                                    className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-2 px-6"
+                                    className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-2 px-4 md:px-6"
                                 >
                                     {currentQuestionIdx < quizData.length - 1 ? "Next" : "View Results"}
                                     <ArrowRight className="w-4 h-4 ml-1" />
