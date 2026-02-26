@@ -13,11 +13,11 @@ export default function Home() {
 
       <section className="flex-1 w-full max-w-5xl p-6 flex flex-col items-center justify-center">
         <div className="text-center max-w-lg space-y-6 mb-12">
-          <h2 className="text-4xl font-extrabold tracking-tight">
-            Transform <span className="text-indigo-400">Documents</span> into Interactive Quizzes
+          <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
+            Transform <span className="text-indigo-400">Knowledge</span> into Interactive Quizzes
           </h2>
           <p className="text-neutral-400 text-lg">
-            Use AI to generate contextual learning experiences from your documents instantly.
+            Use AI to generate contextual learning experiences from your documents or the latest major current affairs headlines.
           </p>
         </div>
 
@@ -28,6 +28,10 @@ export default function Home() {
           <QuizEngine />
         </div>
       </section>
+
+      <footer className="w-full text-center py-6 text-sm text-neutral-600 border-t border-neutral-900 mt-12">
+        <p>Built with ❤️ for rapid, interactive learning.</p>
+      </footer>
     </main>
   );
 }
