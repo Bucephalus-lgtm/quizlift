@@ -4,7 +4,7 @@ import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { UploadCloud, CheckCircle2, XCircle, Brain, BookOpen, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
+import { UploadCloud, CheckCircle2, XCircle, Brain, BookOpen, Loader2, ArrowRight, ArrowLeft, Globe } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -51,11 +51,18 @@ export function QuizEngine() {
         maxFiles: 1,
     });
 
-    const handleGenerateQuiz = async () => {
+    const handleGenerateQuiz = async (isCurrentAffairs: boolean = false) => {
+        if (!isCurrentAffairs && !file) return;
         setLoading(true);
         try {
             let res;
-            if (file) {
+            if (isCurrentAffairs) {
+                const formData = new FormData();
+                formData.append("num_questions", numQuestions.toString());
+                res = await axios.post("/api/python/generate_current_affairs", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
+            } else if (file) {
                 const formData = new FormData();
                 formData.append("file", file);
                 formData.append("quiz_type", quizType);
@@ -64,15 +71,9 @@ export function QuizEngine() {
                 res = await axios.post("/api/python/upload", formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
-            } else {
-                const formData = new FormData();
-                formData.append("num_questions", numQuestions.toString());
-                res = await axios.post("/api/python/generate_current_affairs", formData, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
             }
 
-            if (res.data?.status === "success") {
+            if (res?.data?.status === "success") {
                 setQuizData(res.data.quiz);
             }
         } catch (error: any) {
@@ -312,13 +313,23 @@ export function QuizEngine() {
                 </div>
             </div>
 
-            <div className="flex justify-center pt-2">
+            <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4 mb-6">
                 <Button
-                    onClick={handleGenerateQuiz}
+                    disabled={!file}
+                    onClick={() => handleGenerateQuiz(false)}
                     size="lg"
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-base font-bold px-10 py-6 mb-6 shadow-lg shadow-indigo-500/25 transition-all transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none rounded-xl"
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-base font-bold px-8 py-6 shadow-lg shadow-indigo-500/25 transition-all transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none rounded-xl w-full sm:w-auto"
                 >
-                    <Brain className="mr-2 w-5 h-5" /> {file ? "Generate Magic Quiz" : "Generate Current Affairs Quiz"}
+                    <Brain className="mr-2 w-5 h-5" /> Generate Magic Quiz
+                </Button>
+
+                <Button
+                    onClick={() => handleGenerateQuiz(true)}
+                    size="lg"
+                    variant="outline"
+                    className="border-indigo-500/30 bg-neutral-900/80 hover:bg-indigo-500/10 text-indigo-300 hover:text-indigo-200 text-base font-bold px-8 py-6 shadow-lg transition-all transform hover:scale-105 rounded-xl w-full sm:w-auto"
+                >
+                    <Globe className="mr-2 w-5 h-5" /> Quiz on Current Affairs
                 </Button>
             </div>
         </div>

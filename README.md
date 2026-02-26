@@ -1,6 +1,8 @@
 # QuizLift: Intelligent Document Comprehension & Contextual Assessment
 
-**QuizLift** is a high-performance AI platform designed to bridge the gap between passive reading and active recall. By transforming static reading documents (PDF, DOCX) into dynamic, multi-modal assessment modules, QuizLift empowers users to validate their understanding of complex materials in real-time.
+**QuizLift** is a high-performance AI educational platform. It offers two distinct pathways for active recall:
+1. **Document Comprehension**: Transform static reading materials (PDF, DOCX, DOC) into dynamic, multi-modal assessment modules. 
+2. **Current Affairs Mastery**: Generate instant, context-rich quizzes based on major national and international headlines, optimized specifically for government and civil service exams without needing any uploaded materials.
 
 ![Landing Page - Document Upload](./public/initial_state.png)
 
@@ -16,9 +18,10 @@ Unlike standard Q&A systems, QuizLift utilizes a dual-engine questioning strateg
 
 ## ✨ Core Features
 1.  **Seamless Document Ingestion:** Instantly process dense reading materials, lecture slides, or technical documentation (PDF, DOCX, DOC) via a drag-and-drop interface.
-2.  **Context-Aware MCQ Generation:** High-fidelity parsing ensures all generated questions are strictly relevant to the uploaded content.
-3.  **Real-Time Feedback Loop:** Interactive UI provides immediate validation and detailed explanations for every answer choice.
-4.  **Premium Experience:** A sleek, dark-mode interface built with modern web aesthetics for a focused, distraction-free learning environment.
+2.  **Current Affairs / Gov Exam Mode:** Generate highly-relevant questions on Economics, International Relations, National News, and Science & Tech straight from the latest headlines, perfectly suited for government exam preparation.
+3.  **Context-Aware MCQ Generation:** High-fidelity parsing ensures all generated questions are strictly relevant to the uploaded content with "In & Around" contextual logic.
+4.  **Real-Time Feedback Loop:** Interactive UI provides immediate validation and detailed explanations for every answer choice.
+5.  **Premium Experience:** A sleek, dark-mode interface built with modern web aesthetics for a focused, distraction-free learning environment.
 
 ## 🛠 Technology Stack
 *   **Frontend:** Next.js (App Router), React, Tailwind CSS, Framer Motion, Shadcn UI
