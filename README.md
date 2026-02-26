@@ -1,6 +1,6 @@
 # QuizLift: Intelligent Document Comprehension & Contextual Assessment
 
-**QuizLift** is a high-performance AI platform designed to bridge the gap between passive reading and active recall. By transforming static PDF documents into dynamic, multi-modal assessment modules, QuizLift empowers users to validate their understanding of complex materials in real-time.
+**QuizLift** is a high-performance AI platform designed to bridge the gap between passive reading and active recall. By transforming static reading documents (PDF, DOCX) into dynamic, multi-modal assessment modules, QuizLift empowers users to validate their understanding of complex materials in real-time.
 
 ![Landing Page - Document Upload](./public/initial_state.png)
 

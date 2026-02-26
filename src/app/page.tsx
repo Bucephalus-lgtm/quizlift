@@ -14,7 +14,7 @@ export default function Home() {
       <section className="flex-1 w-full max-w-5xl p-6 flex flex-col items-center justify-center">
         <div className="text-center max-w-lg space-y-6 mb-12">
           <h2 className="text-4xl font-extrabold tracking-tight">
-            Transform <span className="text-indigo-400">PDFs</span> into Interactive Quizzes
+            Transform <span className="text-indigo-400">Documents</span> into Interactive Quizzes
           </h2>
           <p className="text-neutral-400 text-lg">
             Use AI to generate contextual learning experiences from your documents instantly.

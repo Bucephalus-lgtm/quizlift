@@ -63,7 +63,7 @@ def generate_quiz_from_text(text: str, num_questions: int = 10, quiz_type: str =
         type_instruction = f"{text_count} questions MUST be strictly based on the provided text ('text_based'), and {ia_count} questions MUST be 'In and Around' the topic ('in_and_around')."
 
     prompt = f"""
-You are an expert educational AI. I will provide you with text from a PDF.
+You are an expert educational AI. I will provide you with text from a document.
 Your task is to generate exactly {num_questions} multiple-choice questions (MCQs) based on this text.
 
 Requirements:
