@@ -29,8 +29,9 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="w-full text-center py-6 text-sm text-neutral-600 border-t border-neutral-900 mt-12">
+      <footer className="w-full text-center py-6 text-sm text-neutral-600 border-t border-neutral-900 mt-12 flex flex-col items-center space-y-2">
         <p>Built with ❤️ for rapid, interactive learning.</p>
+        <p>&copy; {new Date().getFullYear()} Bhargab Nath</p>
       </footer>
     </main>
   );
