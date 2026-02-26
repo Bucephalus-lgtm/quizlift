@@ -4,7 +4,7 @@
 1. **Document Comprehension**: Transform static reading materials (PDF, DOCX, DOC) into dynamic, multi-modal assessment modules. 
 2. **Current Affairs Mastery**: Generate instant, context-rich quizzes based on major national and international headlines, optimized specifically for government and civil service exams without needing any uploaded materials.
 
-![Landing Page - Document Upload](./public/initial_state.png)
+<img src="./public/initial_state.png" width="100%" alt="Landing Page - Document Upload" />
 
 
 ## 🧠 Advanced AI Logic: Beyond Simple Extraction
@@ -13,7 +13,7 @@ Unlike standard Q&A systems, QuizLift utilizes a dual-engine questioning strateg
 *   **Direct Semantic Mapping:** Challenges the user with questions directly derived from the document's explicit text for foundational verification.
 *   **Conceptual "In & Around" Logic:** Synthesizes the document's core themes to generate questions about related concepts and logical extensions, ensuring a deep conceptual grasp rather than mere rote memorization.
 
-![Interactive Quiz Interface](./public/quiz_state.png)
+<img src="./public/quiz_state.png" width="100%" alt="Interactive Quiz Interface" />
 
 
 ## ✨ Core Features
