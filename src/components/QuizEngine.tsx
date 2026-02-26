@@ -4,7 +4,7 @@ import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { UploadCloud, CheckCircle2, XCircle, Brain, BookOpen, Loader2, ArrowRight } from "lucide-react";
+import { UploadCloud, CheckCircle2, XCircle, Brain, BookOpen, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -31,9 +31,7 @@ export function QuizEngine() {
     const [quizData, setQuizData] = useState<MCQ[] | null>(null);
 
     const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
-    const [selectedOption, setSelectedOption] = useState<number | null>(null);
-    const [showExplanation, setShowExplanation] = useState(false);
-    const [score, setScore] = useState(0);
+    const [answers, setAnswers] = useState<Record<number, { selectedIdx: number, isCorrect: boolean }>>({});
     const [numQuestions, setNumQuestions] = useState(10);
     const [quizType, setQuizType] = useState("mix");
 
@@ -45,7 +43,11 @@ export function QuizEngine() {
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: { "application/pdf": [".pdf"] },
+        accept: {
+            "application/pdf": [".pdf"],
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+            "application/msword": [".doc"]
+        },
         maxFiles: 1,
     });
 
@@ -79,19 +81,22 @@ export function QuizEngine() {
     };
 
     const handleOptionSelect = (idx: number, isCorrect: boolean) => {
-        if (showExplanation) return; // Prevent changing answer
-        setSelectedOption(idx);
-        setShowExplanation(true);
-        if (isCorrect) {
-            setScore((s) => s + 1);
+        if (answers[currentQuestionIdx]) return;
+        setAnswers((prev) => ({
+            ...prev,
+            [currentQuestionIdx]: { selectedIdx: idx, isCorrect },
+        }));
+    };
+
+    const prevQuestion = () => {
+        if (currentQuestionIdx > 0) {
+            setCurrentQuestionIdx((prev) => prev - 1);
         }
     };
 
     const nextQuestion = () => {
         if (!quizData) return;
         if (currentQuestionIdx < quizData.length) {
-            setSelectedOption(null);
-            setShowExplanation(false);
             setCurrentQuestionIdx((prev) => prev + 1);
         }
     };
@@ -100,16 +105,14 @@ export function QuizEngine() {
         setFile(null);
         setQuizData(null);
         setCurrentQuestionIdx(0);
-        setScore(0);
-        setSelectedOption(null);
-        setShowExplanation(false);
+        setAnswers({});
     };
 
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-24 space-y-6">
                 <Loader2 className="w-16 h-16 animate-spin text-indigo-500" />
-                <h3 className="text-xl font-medium text-neutral-300">Summoning AI capabilities to read your PDF...</h3>
+                <h3 className="text-xl font-medium text-neutral-300">Summoning AI capabilities to read your document...</h3>
                 <p className="text-neutral-500">Generating contextual MCQs with "In and Around" variations.</p>
             </div>
         );
@@ -117,6 +120,7 @@ export function QuizEngine() {
 
     // Quiz completion screen
     if (quizData && currentQuestionIdx >= quizData.length) {
+        const finalScore = Object.values(answers).filter((a) => a.isCorrect).length;
         return (
             <Card className="w-full max-w-2xl mx-auto bg-neutral-900 border-neutral-800 text-neutral-100 shadow-xl overflow-hidden glassmorphism">
                 <CardContent className="flex flex-col items-center p-12 space-y-8">
@@ -125,10 +129,10 @@ export function QuizEngine() {
                         Quiz Completed!
                     </h2>
                     <div className="text-2xl">
-                        You scored <span className="font-bold text-emerald-400">{score}</span> out of {quizData.length}
+                        You scored <span className="font-bold text-emerald-400">{finalScore}</span> out of {quizData.length}
                     </div>
                     <Button onClick={resetQuiz} className="bg-indigo-600 hover:bg-indigo-700 w-full max-w-sm mt-4">
-                        Upload Another PDF
+                        Upload Another Document
                     </Button>
                 </CardContent>
             </Card>
@@ -139,6 +143,9 @@ export function QuizEngine() {
     if (quizData && currentQuestionIdx < quizData.length) {
         const q = quizData[currentQuestionIdx];
         const progressVal = ((currentQuestionIdx) / quizData.length) * 100;
+        const currentAnswer = answers[currentQuestionIdx];
+        const showExplanation = !!currentAnswer;
+        const selectedOption = currentAnswer?.selectedIdx;
 
         return (
             <div className="w-full max-w-3xl mx-auto">
@@ -210,18 +217,27 @@ export function QuizEngine() {
                                         <Brain className="w-5 h-5" /> Learn More:
                                     </div>
                                     <p className="leading-relaxed text-sm md:text-base">{q.explanation}</p>
-
-                                    <div className="mt-6 flex justify-end">
-                                        <Button
-                                            onClick={nextQuestion}
-                                            className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-2"
-                                        >
-                                            {currentQuestionIdx < quizData.length - 1 ? "Next Question" : "View Results"}
-                                            <ArrowRight className="w-4 h-4" />
-                                        </Button>
-                                    </div>
                                 </motion.div>
                             )}
+
+                            <div className="mt-8 flex justify-between items-center w-full">
+                                <Button
+                                    onClick={prevQuestion}
+                                    disabled={currentQuestionIdx === 0}
+                                    variant="outline"
+                                    className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white flex items-center gap-2 px-6"
+                                >
+                                    <ArrowLeft className="w-4 h-4 mr-1" /> Previous
+                                </Button>
+                                <Button
+                                    onClick={nextQuestion}
+                                    disabled={!showExplanation}
+                                    className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-2 px-6"
+                                >
+                                    {currentQuestionIdx < quizData.length - 1 ? "Next" : "View Results"}
+                                    <ArrowRight className="w-4 h-4 ml-1" />
+                                </Button>
+                            </div>
                         </Card>
                     </motion.div>
                 </AnimatePresence>
@@ -244,7 +260,7 @@ export function QuizEngine() {
                     <UploadCloud className="w-10 h-10 text-neutral-400 group-hover:text-indigo-400 transition-colors" />
                 </div>
                 <p className="text-xl font-medium text-neutral-300 text-center">
-                    {isDragActive ? "Drop the PDF here..." : "Drag & drop your PDF course material"}
+                    {isDragActive ? "Drop the document here..." : "Drag & drop your study material (PDF, DOCX, DOC)"}
                 </p>
                 <p className="text-sm text-neutral-500 mt-2">Maximum file size: 10MB.</p>
 
