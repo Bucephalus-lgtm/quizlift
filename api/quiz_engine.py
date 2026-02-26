@@ -45,21 +45,32 @@ def _get_mock_quiz() -> dict:
         ]
     }
 
-def generate_quiz_from_text(text: str) -> dict:
+def generate_quiz_from_text(text: str, num_questions: int = 10, quiz_type: str = "mix") -> dict:
     if is_mock_mode:
         print("MOCK MODE: Returning dummy quiz due to missing GEMINI_API_KEY")
-        return _get_mock_quiz()
+        # Adjust mock data to match requested count roughly
+        mock = _get_mock_quiz()
+        return {"questions": mock["questions"][:num_questions]}
+
+    if quiz_type == "text_based":
+        type_instruction = f"All {num_questions} questions MUST be strictly based on the provided text ('text_based')."
+    elif quiz_type == "in_and_around":
+        type_instruction = f"All {num_questions} questions MUST be 'In and Around' the topic - these should be related concepts, drawing from your broader knowledge base, to test deeper understanding ('in_and_around')."
+    else:
+        # Mix
+        text_count = int(num_questions * 0.7)
+        ia_count = num_questions - text_count
+        type_instruction = f"{text_count} questions MUST be strictly based on the provided text ('text_based'), and {ia_count} questions MUST be 'In and Around' the topic ('in_and_around')."
 
     prompt = f"""
 You are an expert educational AI. I will provide you with text from a PDF.
-Your task is to generate exactly 10 multiple-choice questions (MCQs) based on this text.
+Your task is to generate exactly {num_questions} multiple-choice questions (MCQs) based on this text.
 
 Requirements:
-1. 7 questions MUST be strictly based on the provided text ("text_based").
-2. 3 questions MUST be "In and Around" the topic - these should be related concepts, drawing from your broader knowledge base, to test deeper understanding ("in_and_around").
-3. Each question must have exactly 4 options, with exactly 1 correct option.
-4. Provide a detailed explanation for the correct answer, which will be shown in a "Learn More" section.
-5. You MUST return the output as a valid JSON object matching this schema:
+1. {type_instruction}
+2. Each question must have exactly 4 options, with exactly 1 correct option.
+3. Provide a detailed explanation for the correct answer, which will be shown in a "Learn More" section.
+4. You MUST return the output as a valid JSON object matching this schema:
 {{
   "questions": [
     {{

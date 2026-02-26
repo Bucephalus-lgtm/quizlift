@@ -34,6 +34,8 @@ export function QuizEngine() {
     const [selectedOption, setSelectedOption] = useState<number | null>(null);
     const [showExplanation, setShowExplanation] = useState(false);
     const [score, setScore] = useState(0);
+    const [numQuestions, setNumQuestions] = useState(10);
+    const [quizType, setQuizType] = useState("mix");
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
@@ -53,6 +55,8 @@ export function QuizEngine() {
         try {
             const formData = new FormData();
             formData.append("file", file);
+            formData.append("quiz_type", quizType);
+            formData.append("num_questions", numQuestions.toString());
 
             const res = await axios.post("/api/python/upload", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
@@ -252,14 +256,45 @@ export function QuizEngine() {
                 )}
             </div>
 
-            <div className="flex justify-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-neutral-900/50 p-6 rounded-3xl border border-neutral-800 backdrop-blur-sm">
+                <div className="space-y-3">
+                    <label className="text-sm font-semibold text-neutral-400 ml-1 flex items-center gap-2">
+                        <BookOpen size={16} /> Quiz Strategy
+                    </label>
+                    <select
+                        value={quizType}
+                        onChange={(e) => setQuizType(e.target.value)}
+                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer"
+                    >
+                        <option value="mix">Balanced Mix (Default)</option>
+                        <option value="text_based">Strictly Fact-Based</option>
+                        <option value="in_and_around">Conceptually "In & Around"</option>
+                    </select>
+                </div>
+
+                <div className="space-y-3">
+                    <label className="text-sm font-semibold text-neutral-400 ml-1 flex items-center gap-2">
+                        <Brain size={16} /> Question Count (Max 50)
+                    </label>
+                    <input
+                        type="number"
+                        min={1}
+                        max={50}
+                        value={numQuestions}
+                        onChange={(e) => setNumQuestions(Math.min(50, Math.max(1, parseInt(e.target.value) || 1)))}
+                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                    />
+                </div>
+            </div>
+
+            <div className="flex justify-center pt-2">
                 <Button
                     disabled={!file}
                     onClick={handleGenerateQuiz}
                     size="lg"
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-lg font-bold px-8 shadow-lg shadow-indigo-500/25 transition-all transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none"
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-lg font-bold px-12 py-7 shadow-lg shadow-indigo-500/25 transition-all transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none rounded-2xl"
                 >
-                    <Brain className="mr-2 w-5 h-5" /> Generate Magic Quiz
+                    <Brain className="mr-3 w-6 h-6" /> Generate Magic Quiz
                 </Button>
             </div>
         </div>
