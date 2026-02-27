@@ -160,3 +160,49 @@ Requirements:
         if "API_KEY_INVALID" in error_msg or "API key not valid" in error_msg:
             raise ValueError("The GEMINI_API_KEY entered in Vercel is invalid. Please double-check it in your Vercel Environment Variables.")
         raise ValueError(f"Failed to generate valid JSON from AI. Error: {error_msg}")
+
+def generate_flashcards_from_text(text: str, num_flashcards: int = 10) -> dict:
+    if is_mock_mode:
+        print("MOCK MODE: Returning dummy flashcards due to missing GEMINI_API_KEY")
+        return {"flashcards": [{"front": f"Mock Front {i}", "back": f"Mock Back {i}"} for i in range(min(num_flashcards, 2))]}
+
+    prompt = f"""
+You are an expert educational AI. I will provide you with text from a document.
+Your task is to generate exactly {num_flashcards} high-quality flashcards based on this text.
+
+Requirements:
+1. Each flashcard must have a "front" (the question, concept, or term).
+2. Each flashcard must have a "back" (the answer, definition, or explanation).
+3. The content should be concise but highly informative, optimized for active recall.
+4. You MUST return the output as a valid JSON object matching this schema:
+{{
+  "flashcards": [
+    {{
+      "front": "What is the powerhouse of the cell?",
+      "back": "Mitochondria"
+    }}
+  ]
+}}
+
+Here is the source text limit to the first 30000 characters for token limits:
+{text[:30000]}
+    """
+
+    try:
+        response = model.generate_content(prompt)
+        text_resp = response.text.strip()
+        if text_resp.startswith("```json"):
+            text_resp = text_resp[7:]
+        if text_resp.endswith("```"):
+            text_resp = text_resp[:-3]
+        text_resp = text_resp.strip()
+        data = json.loads(text_resp)
+        return data
+    except Exception as e:
+        error_msg = str(e)
+        import traceback
+        traceback.print_exc()
+        print(f"Error calling Gemini or parsing: {error_msg}")
+        if "API_KEY_INVALID" in error_msg or "API key not valid" in error_msg:
+            raise ValueError("The GEMINI_API_KEY entered in Vercel is invalid. Please double-check it in your Vercel Environment Variables.")
+        raise ValueError(f"Failed to generate valid JSON from AI. Error: {error_msg}")
