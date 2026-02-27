@@ -1,4 +1,4 @@
-# QuizLift: Intelligent Document Comprehension & Contextual Assessment
+# QuizLift: AI-Powered Ecosystem for Interactive Quizzes, Flashcards & Active Recall
 
 **QuizLift** is a high-performance AI educational platform. It offers three distinct pathways for active recall:
 1. **Interactive Quizzes**: Transform static reading materials (PDF, DOCX, DOC) into dynamic, multi-modal assessment modules. 
