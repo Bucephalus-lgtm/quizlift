@@ -141,7 +141,7 @@ export function FlashcardEngine() {
                 </div>
                 <Progress value={progressVal} className="h-2 mb-8 bg-neutral-800" indicatorClass="bg-indigo-500" />
 
-                <div className="relative w-full aspect-video perspective-1000 mb-8 cursor-pointer group" onClick={() => setIsFlipped(!isFlipped)}>
+                <div className="relative w-full perspective-1000 mb-8 cursor-pointer group" onClick={() => setIsFlipped(!isFlipped)}>
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={currentCardIdx + (isFlipped ? "-back" : "-front")}
@@ -149,14 +149,20 @@ export function FlashcardEngine() {
                             animate={{ rotateX: 0, opacity: 1 }}
                             exit={{ rotateX: isFlipped ? 90 : -90, opacity: 0 }}
                             transition={{ duration: 0.3 }}
-                            className="absolute inset-0 w-full h-full"
+                            className="w-full"
                         >
-                            <Card className={cn("w-full h-full flex items-center justify-center p-8 border-2 transition-all relative overflow-hidden", isFlipped ? "bg-indigo-900/40 border-indigo-500/50" : "bg-neutral-900/80 border-neutral-700 hover:border-indigo-400")}>
+                            <Card className={cn("w-full min-h-[350px] flex items-center justify-center p-6 md:p-10 border-2 transition-all relative overflow-hidden", isFlipped ? "bg-indigo-900/40 border-indigo-500/50" : "bg-neutral-900/80 border-neutral-700 hover:border-indigo-400")}>
                                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none" />
-                                <CardTitle className="text-2xl md:text-3xl text-center leading-relaxed font-semibold text-neutral-100">
-                                    {isFlipped ? card.back : card.front}
-                                </CardTitle>
-                                <div className="absolute font-light bottom-4 right-4 text-xs text-neutral-500">
+
+                                <div className="flex w-full h-full max-h-[400px] overflow-y-auto justify-center items-center">
+                                    <div className="w-full py-8 px-2 flex justify-center items-center">
+                                        <CardTitle className="text-xl md:text-2xl text-center leading-relaxed font-medium text-neutral-100">
+                                            {isFlipped ? card.back : card.front}
+                                        </CardTitle>
+                                    </div>
+                                </div>
+
+                                <div className="absolute font-light bottom-4 right-6 text-xs text-neutral-500 bg-neutral-900/80 px-2 py-1 rounded">
                                     Click card to flip
                                 </div>
                             </Card>
