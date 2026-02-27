@@ -1,10 +1,14 @@
 # QuizLift: Intelligent Document Comprehension & Contextual Assessment
 
-**QuizLift** is a high-performance AI educational platform. It offers two distinct pathways for active recall:
-1. **Document Comprehension**: Transform static reading materials (PDF, DOCX, DOC) into dynamic, multi-modal assessment modules. 
-2. **Current Affairs Mastery**: Generate instant, context-rich quizzes based on major national and international headlines, optimized specifically for government and civil service exams without needing any uploaded materials.
+**QuizLift** is a high-performance AI educational platform. It offers three distinct pathways for active recall:
+1. **Interactive Quizzes**: Transform static reading materials (PDF, DOCX, DOC) into dynamic, multi-modal assessment modules. 
+2. **Study Flashcards**: Generate beautiful, interactive 3D flashcards instantly from your technical documents or lecture slides.
+3. **Current Affairs Mastery**: Generate instant, context-rich quizzes based on major national and international headlines, optimized specifically for government and civil service exams without needing any uploaded materials.
 
-<img src="./public/initial_state.png" width="100%" alt="Landing Page - Document Upload" />
+<p align="center">
+  <img src="./public/quiz_initial.png" width="48%" alt="Quiz Dashboard" />
+  <img src="./public/flashcard_initial.png" width="48%" alt="Flashcard Dashboard" />
+</p>
 
 
 ## 🧠 Advanced AI Logic: Beyond Simple Extraction
@@ -13,15 +17,19 @@ Unlike standard Q&A systems, QuizLift utilizes a dual-engine questioning strateg
 *   **Direct Semantic Mapping:** Challenges the user with questions directly derived from the document's explicit text for foundational verification.
 *   **Conceptual "In & Around" Logic:** Synthesizes the document's core themes to generate questions about related concepts and logical extensions, ensuring a deep conceptual grasp rather than mere rote memorization.
 
-<img src="./public/quiz_state.png" width="100%" alt="Interactive Quiz Interface" />
+<p align="center">
+  <img src="./public/quiz_active.png" width="48%" alt="Active Quiz Interface" />
+  <img src="./public/flashcard_active.png" width="48%" alt="Interactive Flashcard Interface" />
+</p>
 
 
 ## ✨ Core Features
 1.  **Seamless Document Ingestion:** Instantly process dense reading materials, lecture slides, or technical documentation (PDF, DOCX, DOC) via a drag-and-drop interface.
-2.  **Current Affairs / Gov Exam Mode:** Generate highly-relevant questions on Economics, International Relations, National News, and Science & Tech straight from the latest headlines, perfectly suited for government exam preparation.
-3.  **Context-Aware MCQ Generation:** High-fidelity parsing ensures all generated questions are strictly relevant to the uploaded content with "In & Around" contextual logic.
-4.  **Real-Time Feedback Loop:** Interactive UI provides immediate validation and detailed explanations for every answer choice.
-5.  **Premium Experience:** A sleek, dark-mode interface built with modern web aesthetics for a focused, distraction-free learning environment.
+2.  **Interactive Study Flashcards:** One-click generation of up to 100 beautifully animated 3D flip-cards optimized for active recall learning.
+3.  **Current Affairs / Gov Exam Mode:** Generate highly-relevant questions on Economics, International Relations, National News, and Science & Tech straight from the latest headlines, perfectly suited for government exam preparation.
+4.  **Context-Aware MCQ Generation:** High-fidelity parsing ensures all generated questions are strictly relevant to the uploaded content with "In & Around" contextual logic.
+5.  **Real-Time Feedback Loop:** Interactive UI provides immediate validation and detailed explanations for every answer choice.
+6.  **Premium Experience:** A sleek, dark-mode interface built with modern web aesthetics for a focused, distraction-free learning environment.
 
 ## 🛠 Technology Stack
 *   **Frontend:** Next.js (App Router), React, Tailwind CSS, Framer Motion, Shadcn UI
