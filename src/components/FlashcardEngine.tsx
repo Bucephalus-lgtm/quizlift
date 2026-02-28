@@ -18,6 +18,44 @@ type Flashcard = {
     back: string;
 };
 
+const playFlipSound = () => {
+    try {
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+
+        // Very quick soft noise burst for a paper flip simulation
+        const bufferSize = ctx.sampleRate * 0.15; // 150ms
+        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+
+        const noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        // Bandpass filter targeting paper-like 'swish' frequencies
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 800;
+
+        // Apply envelope
+        const gainNode = ctx.createGain();
+        gainNode.gain.setValueAtTime(0, ctx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.02); // attack
+        gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15); // release
+
+        noise.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        noise.start();
+    } catch (e) {
+        console.warn("Audio playback failed:", e);
+    }
+};
+
 export function FlashcardEngine() {
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
@@ -143,7 +181,7 @@ export function FlashcardEngine() {
                 </div>
                 <Progress value={progressVal} className="h-2 mb-8 bg-neutral-800" indicatorClass="bg-indigo-500" />
 
-                <div className="relative w-full perspective-1000 mb-8 cursor-pointer group" onClick={() => setIsFlipped(!isFlipped)}>
+                <div className="relative w-full perspective-1000 mb-8 cursor-pointer group" onClick={() => { playFlipSound(); setIsFlipped(!isFlipped); }}>
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={currentCardIdx + (isFlipped ? "-back" : "-front")}
