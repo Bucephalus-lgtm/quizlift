@@ -45,7 +45,7 @@ def _get_mock_quiz() -> dict:
         ]
     }
 
-def generate_quiz_from_text(text: str, num_questions: int = 10, quiz_type: str = "mix") -> dict:
+def generate_quiz_from_text(text: str, num_questions: int = 10, quiz_type: str = "mix", difficulty: str = "Medium") -> dict:
     if is_mock_mode:
         print("MOCK MODE: Returning dummy quiz due to missing GEMINI_API_KEY")
         # Adjust mock data to match requested count roughly
@@ -68,9 +68,10 @@ Your task is to generate exactly {num_questions} multiple-choice questions (MCQs
 
 Requirements:
 1. {type_instruction}
-2. Each question must have exactly 4 options, with exactly 1 correct option.
-3. Provide a detailed explanation for the correct answer, which will be shown in a "Learn More" section.
-4. You MUST return the output as a valid JSON object matching this schema:
+2. The difficulty level of the questions MUST be: {difficulty}. Adjust the vocabulary, distractors, and depth of the question accordingly.
+3. Each question must have exactly 4 options, with exactly 1 correct option.
+4. Provide a detailed explanation for the correct answer, which will be shown in a "Learn More" section.
+5. You MUST return the output as a valid JSON object matching this schema:
 {{
   "questions": [
     {{
@@ -110,7 +111,7 @@ Here is the source text limit to the first 30000 characters for token limits:
             raise ValueError("The GEMINI_API_KEY entered in Vercel is invalid. Please double-check it in your Vercel Environment Variables.")
         raise ValueError(f"Failed to generate valid JSON from AI. Error: {error_msg}")
 
-def generate_current_affairs_quiz(num_questions: int = 10) -> dict:
+def generate_current_affairs_quiz(num_questions: int = 10, difficulty: str = "Medium") -> dict:
     if is_mock_mode:
         print("MOCK MODE: Returning dummy quiz due to missing GEMINI_API_KEY")
         mock = _get_mock_quiz()
@@ -122,9 +123,10 @@ Your task is to generate exactly {num_questions} multiple-choice questions (MCQs
 
 Requirements:
 1. Questions must cover diverse topics like National News, International Relations, Economy, Environment, and Science & Tech.
-2. Each question must have exactly 4 options, with exactly 1 correct option.
-3. Provide a detailed explanation for the correct answer, which will be shown in a "Learn More" section.
-4. You MUST return the output as a valid JSON object matching this schema:
+2. The difficulty level of the questions MUST be: {difficulty}. Adjust the complexity of the current affairs topics and options accordingly.
+3. Each question must have exactly 4 options, with exactly 1 correct option.
+4. Provide a detailed explanation for the correct answer, which will be shown in a "Learn More" section.
+5. You MUST return the output as a valid JSON object matching this schema:
 {{
   "questions": [
     {{
@@ -161,7 +163,7 @@ Requirements:
             raise ValueError("The GEMINI_API_KEY entered in Vercel is invalid. Please double-check it in your Vercel Environment Variables.")
         raise ValueError(f"Failed to generate valid JSON from AI. Error: {error_msg}")
 
-def generate_flashcards_from_text(text: str, num_flashcards: int = 10) -> dict:
+def generate_flashcards_from_text(text: str, num_flashcards: int = 10, difficulty: str = "Medium") -> dict:
     if is_mock_mode:
         print("MOCK MODE: Returning dummy flashcards due to missing GEMINI_API_KEY")
         return {"flashcards": [{"front": f"Mock Front {i}", "back": f"Mock Back {i}"} for i in range(min(num_flashcards, 2))]}
@@ -174,7 +176,8 @@ Requirements:
 1. Each flashcard must have a "front" (the question, concept, or term).
 2. Each flashcard must have a "back" (the answer, definition, or explanation).
 3. The content should be concise but highly informative, optimized for active recall.
-4. You MUST return the output as a valid JSON object matching this schema:
+4. The difficulty level of the flashcards MUST be: {difficulty}. Adjust the concepts and depth accordingly.
+5. You MUST return the output as a valid JSON object matching this schema:
 {{
   "flashcards": [
     {{

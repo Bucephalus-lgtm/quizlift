@@ -34,6 +34,7 @@ export function QuizEngine() {
     const [answers, setAnswers] = useState<Record<number, { selectedIdx: number, isCorrect: boolean }>>({});
     const [numQuestions, setNumQuestions] = useState(10);
     const [quizType, setQuizType] = useState("mix");
+    const [difficulty, setDifficulty] = useState("Medium");
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
@@ -59,6 +60,7 @@ export function QuizEngine() {
             if (isCurrentAffairs) {
                 const formData = new FormData();
                 formData.append("num_questions", numQuestions.toString());
+                formData.append("difficulty", difficulty);
                 res = await axios.post("/api/python/generate_current_affairs", formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
@@ -67,6 +69,7 @@ export function QuizEngine() {
                 formData.append("file", file);
                 formData.append("quiz_type", quizType);
                 formData.append("num_questions", numQuestions.toString());
+                formData.append("difficulty", difficulty);
 
                 res = await axios.post("/api/python/upload", formData, {
                     headers: { "Content-Type": "multipart/form-data" },
@@ -281,7 +284,7 @@ export function QuizEngine() {
                 )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-neutral-900/50 p-6 rounded-3xl border border-neutral-800 backdrop-blur-sm">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-neutral-900/50 p-6 rounded-3xl border border-neutral-800 backdrop-blur-sm">
                 <div className="space-y-3">
                     <label className="text-sm font-semibold text-neutral-400 ml-1 flex items-center gap-2">
                         <BookOpen size={16} /> Quiz Strategy {(!file) && "(Disabled w/o Doc)"}
@@ -310,6 +313,21 @@ export function QuizEngine() {
                         onChange={(e) => setNumQuestions(Math.min(50, Math.max(1, parseInt(e.target.value) || 1)))}
                         className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                     />
+                </div>
+
+                <div className="space-y-3">
+                    <label className="text-sm font-semibold text-neutral-400 ml-1 flex items-center gap-2">
+                        <Brain size={16} /> Difficulty Level
+                    </label>
+                    <select
+                        value={difficulty}
+                        onChange={(e) => setDifficulty(e.target.value)}
+                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer"
+                    >
+                        <option value="Easy">Easy</option>
+                        <option value="Medium">Medium (Default)</option>
+                        <option value="Difficult">Difficult</option>
+                    </select>
                 </div>
             </div>
 

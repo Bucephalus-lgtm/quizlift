@@ -43,12 +43,13 @@ async def _extract_text_from_file(file: UploadFile) -> str:
 async def upload_document(
     file: UploadFile = File(...),
     quiz_type: str = Form("mix"),
-    num_questions: int = Form(10)
+    num_questions: int = Form(10),
+    difficulty: str = Form("Medium")
 ):
     try:
         text = await _extract_text_from_file(file)
         
-        quiz_data = generate_quiz_from_text(text, num_questions=num_questions, quiz_type=quiz_type)
+        quiz_data = generate_quiz_from_text(text, num_questions=num_questions, quiz_type=quiz_type, difficulty=difficulty)
         return {"status": "success", "quiz": quiz_data["questions"]}
     except Exception as e:
         import traceback
@@ -57,13 +58,14 @@ async def upload_document(
 
 @app.post("/api/python/generate_current_affairs")
 async def get_current_affairs(
-    num_questions: int = Form(10)
+    num_questions: int = Form(10),
+    difficulty: str = Form("Medium")
 ):
     if num_questions < 1 or num_questions > 50:
          raise HTTPException(status_code=400, detail="Number of questions must be between 1 and 50.")
     
     try:
-        quiz_data = generate_current_affairs_quiz(num_questions=num_questions)
+        quiz_data = generate_current_affairs_quiz(num_questions=num_questions, difficulty=difficulty)
         return {"status": "success", "quiz": quiz_data["questions"]}
     except Exception as e:
         import traceback
@@ -73,14 +75,15 @@ async def get_current_affairs(
 @app.post("/api/python/upload_flashcards")
 async def upload_flashcards(
     file: UploadFile = File(...),
-    num_flashcards: int = Form(10)
+    num_flashcards: int = Form(10),
+    difficulty: str = Form("Medium")
 ):
     if num_flashcards < 1 or num_flashcards > 100:
          raise HTTPException(status_code=400, detail="Number of flashcards must be between 1 and 100.")
     
     try:
         text = await _extract_text_from_file(file)        
-        flashcards_data = generate_flashcards_from_text(text, num_flashcards=num_flashcards)
+        flashcards_data = generate_flashcards_from_text(text, num_flashcards=num_flashcards, difficulty=difficulty)
         return {"status": "success", "flashcards": flashcards_data["flashcards"]}
     except Exception as e:
         import traceback
