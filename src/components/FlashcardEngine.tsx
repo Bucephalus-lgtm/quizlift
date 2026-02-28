@@ -4,7 +4,7 @@ import axios from "axios";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { UploadCloud, Brain, BookOpen, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
+import { UploadCloud, Brain, BookOpen, Loader2, ArrowRight, ArrowLeft, Volume2, VolumeX } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -24,32 +24,44 @@ const playFlipSound = () => {
         if (!AudioContext) return;
         const ctx = new AudioContext();
 
-        // Very quick soft noise burst for a paper flip simulation
-        const bufferSize = ctx.sampleRate * 0.15; // 150ms
+        // 1. A short, low-mid soft "thud" (the card moving)
+        const osc = ctx.createOscillator();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(300, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.1);
+
+        const oscGain = ctx.createGain();
+        oscGain.gain.setValueAtTime(0, ctx.currentTime);
+        oscGain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.01); // attack
+        oscGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1); // release
+
+        osc.connect(oscGain);
+        oscGain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.1);
+
+        // 2. A crisp high frequency "snap/swish" (the paper friction)
+        const bufferSize = ctx.sampleRate * 0.05; // 50ms
         const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) {
             data[i] = Math.random() * 2 - 1;
         }
-
         const noise = ctx.createBufferSource();
         noise.buffer = buffer;
 
-        // Bandpass filter targeting paper-like 'swish' frequencies
         const filter = ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.value = 800;
+        filter.type = 'highpass';
+        filter.frequency.value = 2000;
 
-        // Apply envelope
-        const gainNode = ctx.createGain();
-        gainNode.gain.setValueAtTime(0, ctx.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.02); // attack
-        gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15); // release
+        const noiseGain = ctx.createGain();
+        noiseGain.gain.setValueAtTime(0, ctx.currentTime);
+        noiseGain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.01);
+        noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
 
         noise.connect(filter);
-        filter.connect(gainNode);
-        gainNode.connect(ctx.destination);
-
+        filter.connect(noiseGain);
+        noiseGain.connect(ctx.destination);
         noise.start();
     } catch (e) {
         console.warn("Audio playback failed:", e);
@@ -65,6 +77,7 @@ export function FlashcardEngine() {
     const [isFlipped, setIsFlipped] = useState(false);
     const [numFlashcards, setNumFlashcards] = useState(10);
     const [difficulty, setDifficulty] = useState("Medium");
+    const [isMuted, setIsMuted] = useState(false);
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
@@ -176,12 +189,19 @@ export function FlashcardEngine() {
                 <div className="w-full flex items-center justify-between mb-4 text-sm font-medium text-neutral-400">
                     <span>Card {currentCardIdx + 1} of {flashcards.length}</span>
                     <span className="flex items-center gap-2">
+                        <button
+                            onClick={() => setIsMuted(!isMuted)}
+                            className="text-neutral-500 hover:text-neutral-300 transition-colors p-1"
+                            title={isMuted ? "Unmute sounds" : "Mute sounds"}
+                        >
+                            {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                        </button>
                         <span className="text-indigo-400 bg-indigo-400/10 px-2 py-1 rounded-md flex items-center gap-1"><Brain size={14} /> Flashcard Mode</span>
                     </span>
                 </div>
                 <Progress value={progressVal} className="h-2 mb-8 bg-neutral-800" indicatorClass="bg-indigo-500" />
 
-                <div className="relative w-full perspective-1000 mb-8 cursor-pointer group" onClick={() => { playFlipSound(); setIsFlipped(!isFlipped); }}>
+                <div className="relative w-full perspective-1000 mb-8 cursor-pointer group" onClick={() => { if (!isMuted) playFlipSound(); setIsFlipped(!isFlipped); }}>
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={currentCardIdx + (isFlipped ? "-back" : "-front")}
