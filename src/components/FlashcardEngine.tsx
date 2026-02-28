@@ -23,35 +23,94 @@ const playFlipSound = () => {
         const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
         if (!AudioContext) return;
         const ctx = new AudioContext();
-
-        // Asian Koel "Koo-Ooo" Synthetic Bird Sound
-        const osc = ctx.createOscillator();
-        const gainNode = ctx.createGain();
-
-        osc.connect(gainNode);
-        gainNode.connect(ctx.destination);
-
         const now = ctx.currentTime;
-        osc.type = 'sine';
+        const soundType = Math.floor(Math.random() * 10);
 
-        // Syllable 1: "Koo"
-        osc.frequency.setValueAtTime(700, now);
-        osc.frequency.linearRampToValueAtTime(850, now + 0.15);
+        const playOsc = (type: OscillatorType, freq1: number, freq2: number, attack: number, release: number, vol: number) => {
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq1, now);
+            if (freq2 !== freq1) osc.frequency.exponentialRampToValueAtTime(freq2, now + release);
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(vol, now + attack);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + release);
+            osc.start(now);
+            osc.stop(now + release);
+        };
 
-        gainNode.gain.setValueAtTime(0, now);
-        gainNode.gain.linearRampToValueAtTime(0.4, now + 0.05); // Attack
-        gainNode.gain.linearRampToValueAtTime(0.01, now + 0.15); // Release
+        const playNoise = (filterFreq: number, release: number, vol: number) => {
+            const bufferSize = ctx.sampleRate * release;
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+            const noise = ctx.createBufferSource();
+            noise.buffer = buffer;
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.value = filterFreq;
+            const gainNode = ctx.createGain();
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(vol, now + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + release);
+            noise.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            noise.start(now);
+            noise.stop(now + release);
+        };
 
-        // Syllable 2: "Ooo"
-        osc.frequency.setValueAtTime(950, now + 0.16);
-        osc.frequency.linearRampToValueAtTime(1200, now + 0.35);
-
-        gainNode.gain.setValueAtTime(0, now + 0.16);
-        gainNode.gain.linearRampToValueAtTime(0.5, now + 0.25); // Attack
-        gainNode.gain.linearRampToValueAtTime(0.01, now + 0.4); // Release
-
-        osc.start(now);
-        osc.stop(now + 0.45);
+        switch (soundType) {
+            case 0: // Asian Koel "Koo-Ooo"
+                const osc0 = ctx.createOscillator();
+                const gain0 = ctx.createGain();
+                osc0.connect(gain0); gain0.connect(ctx.destination);
+                osc0.type = 'sine';
+                osc0.frequency.setValueAtTime(700, now);
+                osc0.frequency.linearRampToValueAtTime(850, now + 0.15);
+                gain0.gain.setValueAtTime(0, now);
+                gain0.gain.linearRampToValueAtTime(0.4, now + 0.05);
+                gain0.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                osc0.frequency.setValueAtTime(950, now + 0.16);
+                osc0.frequency.linearRampToValueAtTime(1200, now + 0.35);
+                gain0.gain.setValueAtTime(0, now + 0.16);
+                gain0.gain.linearRampToValueAtTime(0.5, now + 0.25);
+                gain0.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                osc0.start(now); osc0.stop(now + 0.45);
+                break;
+            case 1: // Standard Paper Snap
+                playOsc('triangle', 300, 50, 0.01, 0.1, 0.5);
+                playNoise(2000, 0.05, 0.15);
+                break;
+            case 2: // Soft Thud
+                playOsc('sine', 150, 40, 0.01, 0.15, 0.6);
+                break;
+            case 3: // Chime
+                playOsc('sine', 1200, 1200, 0.01, 0.4, 0.3);
+                playOsc('sine', 1600, 1600, 0.02, 0.5, 0.2);
+                break;
+            case 4: // Woodblock
+                playOsc('square', 800, 600, 0.005, 0.05, 0.4);
+                break;
+            case 5: // Swoosh
+                playNoise(500, 0.2, 0.3);
+                break;
+            case 6: // Glass Ping
+                playOsc('sine', 2000, 2000, 0.005, 0.3, 0.4);
+                playOsc('sine', 2800, 2800, 0.005, 0.2, 0.2);
+                break;
+            case 7: // Bubble Pop
+                playOsc('sine', 400, 800, 0.01, 0.08, 0.5);
+                break;
+            case 8: // Marimba
+                playOsc('sine', 600, 550, 0.01, 0.2, 0.6);
+                break;
+            case 9: // Synth Blip
+                playOsc('sawtooth', 1000, 1500, 0.01, 0.1, 0.3);
+                break;
+        }
     } catch (e) {
         console.warn("Audio playback failed:", e);
     }
