@@ -59,13 +59,24 @@ async def upload_document(
 @app.post("/api/python/generate_current_affairs")
 async def get_current_affairs(
     num_questions: int = Form(10),
-    difficulty: str = Form("Medium")
+    difficulty: str = Form("Medium"),
+    topic: str = Form("All"),
+    location: str = Form("India"),
+    start_date: str = Form(None),
+    end_date: str = Form(None)
 ):
     if num_questions < 1 or num_questions > 50:
          raise HTTPException(status_code=400, detail="Number of questions must be between 1 and 50.")
     
     try:
-        quiz_data = generate_current_affairs_quiz(num_questions=num_questions, difficulty=difficulty)
+        quiz_data = generate_current_affairs_quiz(
+            num_questions=num_questions, 
+            difficulty=difficulty,
+            topic=topic,
+            location=location,
+            start_date=start_date,
+            end_date=end_date
+        )
         return {"status": "success", "quiz": quiz_data["questions"]}
     except Exception as e:
         import traceback

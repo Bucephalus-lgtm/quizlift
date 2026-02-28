@@ -111,21 +111,48 @@ Here is the source text limit to the first 30000 characters for token limits:
             raise ValueError("The GEMINI_API_KEY entered in Vercel is invalid. Please double-check it in your Vercel Environment Variables.")
         raise ValueError(f"Failed to generate valid JSON from AI. Error: {error_msg}")
 
-def generate_current_affairs_quiz(num_questions: int = 10, difficulty: str = "Medium") -> dict:
+from datetime import date
+def generate_current_affairs_quiz(
+    num_questions: int = 10, 
+    difficulty: str = "Medium",
+    topic: str = "All",
+    location: str = "India",
+    start_date: str = None,
+    end_date: str = None
+) -> dict:
     if is_mock_mode:
         print("MOCK MODE: Returning dummy quiz due to missing GEMINI_API_KEY")
         mock = _get_mock_quiz()
         return {"questions": mock["questions"][:num_questions]}
 
+    today_str = date.today().isoformat()
+    topic_str = "All general topics" if not topic or topic.lower() == "all" else topic
+    loc_str = "India (or global impact on India)" if not location or location.lower() == "india" else location
+    
+    date_constraint = ""
+    if start_date and end_date:
+        date_constraint = f"from {start_date} to {end_date}"
+    elif start_date:
+        date_constraint = f"from {start_date} up to {today_str}"
+    else:
+        date_constraint = f"leading up to today: {today_str}"
+
     prompt = f"""
-You are an expert educator and quiz master for Indian government exams.
-Your task is to generate exactly {num_questions} multiple-choice questions (MCQs) covering recent Current Affairs from major Indian news headlines that are highly important for government and civil service exams.
+You are an expert educator and quiz master for current affairs and competitive exams.
+Today's Date is: {today_str}.
+
+Your task is to generate exactly {num_questions} completely factual and UP-TO-DATE multiple-choice questions (MCQs) covering recent Current Affairs.
+
+CRITICAL FILTERS:
+- Location: {loc_str}
+- Topic Segment(s): {topic_str}
+- Timeline of Events: MUST be strictly events that occurred {date_constraint}. Do not include outdated questions prior to this window.
 
 Requirements:
-1. Questions must cover diverse topics like National News, International Relations, Economy, Environment, and Science & Tech.
+1. Questions must cover highly relevant news events, policy changes, scientific breakthroughs, or economic shifts corresponding to the filters above.
 2. The difficulty level of the questions MUST be: {difficulty}. Adjust the complexity of the current affairs topics and options accordingly.
 3. Each question must have exactly 4 options, with exactly 1 correct option.
-4. Provide a detailed explanation for the correct answer, which will be shown in a "Learn More" section.
+4. Provide a detailed explanation for the correct answer, which will be shown in a "Learn More" section. Include exactly when it happened if possible.
 5. You MUST return the output as a valid JSON object matching this schema:
 {{
   "questions": [
@@ -137,7 +164,7 @@ Requirements:
         {{"text": "Option C", "is_correct": false}},
         {{"text": "Option D", "is_correct": false}}
       ],
-      "explanation": "Detailed explanation of why B is correct, including context.",
+      "explanation": "Detailed explanation of why B is correct, including context and dates.",
       "type": "current_affairs"
     }}
   ]

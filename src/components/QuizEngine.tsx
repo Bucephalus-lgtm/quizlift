@@ -36,6 +36,13 @@ export function QuizEngine() {
     const [quizType, setQuizType] = useState("mix");
     const [difficulty, setDifficulty] = useState("Medium");
 
+    const defaultStartDate = new Date();
+    defaultStartDate.setFullYear(defaultStartDate.getFullYear() - 1);
+    const [caTopic, setCaTopic] = useState("All");
+    const [caLocation, setCaLocation] = useState("India");
+    const [caStartDate, setCaStartDate] = useState(defaultStartDate.toISOString().split('T')[0]);
+    const [caEndDate, setCaEndDate] = useState(new Date().toISOString().split('T')[0]);
+
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
             setFile(acceptedFiles[0]);
@@ -61,6 +68,10 @@ export function QuizEngine() {
                 const formData = new FormData();
                 formData.append("num_questions", numQuestions.toString());
                 formData.append("difficulty", difficulty);
+                formData.append("topic", caTopic);
+                formData.append("location", caLocation);
+                formData.append("start_date", caStartDate);
+                formData.append("end_date", caEndDate);
                 res = await axios.post("/api/python/generate_current_affairs", formData, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
@@ -328,6 +339,54 @@ export function QuizEngine() {
                         <option value="Medium">Medium (Default)</option>
                         <option value="Difficult">Difficult</option>
                     </select>
+                </div>
+            </div>
+
+            <div className="bg-neutral-900/40 p-5 rounded-3xl border border-neutral-800/80 backdrop-blur-sm">
+                <h3 className="text-sm font-semibold text-neutral-400 mb-4 flex items-center gap-2 px-1">
+                    <Globe size={16} /> Current Affairs Targeting (For "Current Affairs" button only)
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                        <label className="text-xs font-semibold text-neutral-500 ml-1">Topic</label>
+                        <input
+                            type="text"
+                            value={caTopic}
+                            onChange={(e) => setCaTopic(e.target.value)}
+                            placeholder="All"
+                            className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder-neutral-600"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-xs font-semibold text-neutral-500 ml-1">Location</label>
+                        <input
+                            type="text"
+                            value={caLocation}
+                            onChange={(e) => setCaLocation(e.target.value)}
+                            placeholder="India"
+                            className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder-neutral-600"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-xs font-semibold text-neutral-500 ml-1">Date Range (Approx)</label>
+                        <div className="flex gap-2">
+                            <input
+                                title="Start Date"
+                                type="date"
+                                value={caStartDate}
+                                onChange={(e) => setCaStartDate(e.target.value)}
+                                className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-2 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all custom-date-input"
+                            />
+                            <span className="text-neutral-500 self-center">to</span>
+                            <input
+                                title="End Date"
+                                type="date"
+                                value={caEndDate}
+                                onChange={(e) => setCaEndDate(e.target.value)}
+                                className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-2 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all custom-date-input"
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
 

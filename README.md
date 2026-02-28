@@ -27,10 +27,11 @@ Unlike standard Q&A systems, QuizLift utilizes a dual-engine questioning strateg
 1.  **Seamless Document Ingestion:** Instantly process dense reading materials, lecture slides, or technical documentation (PDF, DOCX, DOC) via a drag-and-drop interface.
 2.  **Interactive Study Flashcards:** One-click generation of up to 100 beautifully animated 3D flip-cards optimized for active recall learning.
 3.  **Current Affairs / Gov Exam Mode:** Generate highly-relevant questions on Economics, International Relations, National News, and Science & Tech straight from the latest headlines, perfectly suited for government exam preparation.
-4.  **Scalable Difficulty Levels:** Customize your learning experience by generating Quizzes, Flashcards, and Current Affairs modules at **Easy**, **Medium**, or **Difficult** levels.
-5.  **Context-Aware MCQ Generation:** High-fidelity parsing ensures all generated questions are strictly relevant to the uploaded content with "In & Around" contextual logic.
-6.  **Real-Time Feedback Loop:** Interactive UI provides immediate validation and detailed explanations for every answer choice.
-7.  **Premium Experience:** A sleek, dark-mode interface built with modern web aesthetics for a focused, distraction-free learning environment.
+4.  **Advanced Current Affairs Targeting:** Take complete control over the AI engine by specifying exact geographic **Locations** (e.g., India vs Global), narrowing down to specific **Topics**, and setting strict **Date Ranges** (defaulting to the past 1 year) to ensure contextually fresh and accurate testing.
+5.  **Scalable Difficulty Levels:** Customize your learning experience by generating Quizzes, Flashcards, and Current Affairs modules at **Easy**, **Medium**, or **Difficult** levels.
+6.  **Context-Aware MCQ Generation:** High-fidelity parsing ensures all generated questions are strictly relevant to the uploaded content with "In & Around" contextual logic.
+7.  **Real-Time Feedback Loop:** Interactive UI provides immediate validation and detailed explanations for every answer choice.
+8.  **Premium Experience:** A sleek, dark-mode interface built with modern web aesthetics for a focused, distraction-free learning environment.
 
 ## 🛠 Technology Stack
 *   **Frontend:** Next.js (App Router), React, Tailwind CSS, Framer Motion, Shadcn UI
