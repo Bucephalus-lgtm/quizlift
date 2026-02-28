@@ -24,45 +24,34 @@ const playFlipSound = () => {
         if (!AudioContext) return;
         const ctx = new AudioContext();
 
-        // 1. A short, low-mid soft "thud" (the card moving)
+        // Asian Koel "Koo-Ooo" Synthetic Bird Sound
         const osc = ctx.createOscillator();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(300, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.1);
+        const gainNode = ctx.createGain();
 
-        const oscGain = ctx.createGain();
-        oscGain.gain.setValueAtTime(0, ctx.currentTime);
-        oscGain.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.01); // attack
-        oscGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1); // release
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
 
-        osc.connect(oscGain);
-        oscGain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.1);
+        const now = ctx.currentTime;
+        osc.type = 'sine';
 
-        // 2. A crisp high frequency "snap/swish" (the paper friction)
-        const bufferSize = ctx.sampleRate * 0.05; // 50ms
-        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-        }
-        const noise = ctx.createBufferSource();
-        noise.buffer = buffer;
+        // Syllable 1: "Koo"
+        osc.frequency.setValueAtTime(700, now);
+        osc.frequency.linearRampToValueAtTime(850, now + 0.15);
 
-        const filter = ctx.createBiquadFilter();
-        filter.type = 'highpass';
-        filter.frequency.value = 2000;
+        gainNode.gain.setValueAtTime(0, now);
+        gainNode.gain.linearRampToValueAtTime(0.4, now + 0.05); // Attack
+        gainNode.gain.linearRampToValueAtTime(0.01, now + 0.15); // Release
 
-        const noiseGain = ctx.createGain();
-        noiseGain.gain.setValueAtTime(0, ctx.currentTime);
-        noiseGain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.01);
-        noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+        // Syllable 2: "Ooo"
+        osc.frequency.setValueAtTime(950, now + 0.16);
+        osc.frequency.linearRampToValueAtTime(1200, now + 0.35);
 
-        noise.connect(filter);
-        filter.connect(noiseGain);
-        noiseGain.connect(ctx.destination);
-        noise.start();
+        gainNode.gain.setValueAtTime(0, now + 0.16);
+        gainNode.gain.linearRampToValueAtTime(0.5, now + 0.25); // Attack
+        gainNode.gain.linearRampToValueAtTime(0.01, now + 0.4); // Release
+
+        osc.start(now);
+        osc.stop(now + 0.45);
     } catch (e) {
         console.warn("Audio playback failed:", e);
     }
