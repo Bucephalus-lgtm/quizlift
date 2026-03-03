@@ -56,6 +56,8 @@ def generate_quiz_from_text(text: str, num_questions: int = 10, quiz_type: str =
         type_instruction = f"All {num_questions} questions MUST be strictly based on the provided text ('text_based')."
     elif quiz_type == "in_and_around":
         type_instruction = f"All {num_questions} questions MUST be 'In and Around' the topic - these should be related concepts, drawing from your broader knowledge base, to test deeper understanding ('in_and_around')."
+    elif quiz_type == "ultra_difficult":
+        type_instruction = f"All {num_questions} questions MUST be 'Ultra Difficult' logical combinations. For EACH question, formulate 4 distinct factual statements (Statement 1, Statement 2, Statement 3, Statement 4) combining facts directly from the text and absolute related indisputable factual extensions ('In and Around'). The options (A, B, C, D) MUST be strictly combinations of the truth values of these statements (e.g. '1 and 2', '1, 2 and 3', 'Only 4', 'All 1, 2, 3 and 4'). There must be NO anomalies and exactly ONE option must perfectly match the truth. Present the 4 statements clearly labeled in the question field itself. ('ultra_difficult')."
     else:
         # Mix
         text_count = int(num_questions * 0.7)
@@ -82,8 +84,8 @@ Requirements:
         {{"text": "Option C", "is_correct": false}},
         {{"text": "Option D", "is_correct": false}}
       ],
-      "explanation": "Detailed explanation of why B is correct.",
-      "type": "text_based" // or "in_and_around"
+      "explanation": "Detailed explanation of why B is correct, breaking down the truth of each individual statement if applicable.",
+      "type": "text_based" // or "in_and_around" or "ultra_difficult"
     }}
   ]
 }}

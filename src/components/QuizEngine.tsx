@@ -215,7 +215,9 @@ export function QuizEngine() {
                 <div className="w-full flex items-center justify-between mb-4 text-sm font-medium text-neutral-500 dark:text-neutral-400">
                     <span>Question {currentQuestionIdx + 1} of {quizData.length}</span>
                     <span className="flex items-center gap-2">
-                        {q.type === "in_and_around" ? (
+                        {q.type === "ultra_difficult" ? (
+                            <span className="text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-400/10 px-2 py-1 rounded-md flex items-center gap-1"><Brain size={14} /> Ultra Difficult</span>
+                        ) : q.type === "in_and_around" ? (
                             <span className="text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-400/10 px-2 py-1 rounded-md flex items-center gap-1"><Brain size={14} /> In & Around</span>
                         ) : (
                             <span className="text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-400/10 px-2 py-1 rounded-md flex items-center gap-1"><BookOpen size={14} /> Text Based</span>
@@ -349,6 +351,7 @@ export function QuizEngine() {
                         <option value="mix">Balanced Mix (Default)</option>
                         <option value="text_based">Strictly Fact-Based</option>
                         <option value="in_and_around">Conceptually "In & Around"</option>
+                        <option value="ultra_difficult">Ultra Difficult (Statements)</option>
                     </select>
                 </div>
 
