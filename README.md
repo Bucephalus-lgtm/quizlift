@@ -6,10 +6,9 @@
 3. **Current Affairs Mastery**: Generate instant, context-rich quizzes based on major national and international headlines, optimized specifically for government and civil service exams without needing any uploaded materials.
 
 <p align="center">
-  <img src="./public/quiz_initial.png" width="48%" alt="Quiz Dashboard" />
-  <img src="./public/flashcard_initial.png" width="48%" alt="Flashcard Dashboard" />
+  <img src="./public/light_mode_demo.png" width="48%" alt="Quiz Dashboard - Light Mode" />
+  <img src="./public/dark_mode_demo.png" width="48%" alt="Flashcard Dashboard - Dark Mode" />
 </p>
-
 
 ## 🧠 Advanced AI Logic: Beyond Simple Extraction
 Unlike standard Q&A systems, QuizLift utilizes a dual-engine questioning strategy powered by **Google Gemini 1.5/2.5**:
@@ -31,7 +30,7 @@ Unlike standard Q&A systems, QuizLift utilizes a dual-engine questioning strateg
 5.  **Scalable Difficulty Levels:** Customize your learning experience by generating Quizzes, Flashcards, and Current Affairs modules at **Easy**, **Medium**, or **Difficult** levels.
 6.  **Context-Aware MCQ Generation:** High-fidelity parsing ensures all generated questions are strictly relevant to the uploaded content with "In & Around" contextual logic.
 7.  **Real-Time Feedback Loop:** Interactive UI provides immediate validation and detailed explanations for every answer choice.
-8.  **Premium Experience:** A sleek, dark-mode interface built with modern web aesthetics for a focused, distraction-free learning environment.
+8.  **Premium Dual-Theme Experience:** Seamlessly toggle between a sleek **Dark Mode** and a clean **Light Mode** interface. Includes micro-animations and custom synthetic audio (e.g., an Asian Koel bird call on flashcard flip) built using the Web Audio API for a distraction-free, highly engaging environment.
 
 ## 🛠 Technology Stack
 *   **Frontend:** Next.js (App Router), React, Tailwind CSS, Framer Motion, Shadcn UI
