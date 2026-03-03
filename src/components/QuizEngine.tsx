@@ -135,8 +135,8 @@ export function QuizEngine() {
         return (
             <div className="flex flex-col items-center justify-center py-24 space-y-6">
                 <Loader2 className="w-16 h-16 animate-spin text-indigo-500" />
-                <h3 className="text-xl font-medium text-neutral-300">Summoning AI capabilities...</h3>
-                <p className="text-neutral-500">Generating contextual MCQs to test your knowledge.</p>
+                <h3 className="text-xl font-medium text-neutral-800 dark:text-neutral-300">Summoning AI capabilities...</h3>
+                <p className="text-neutral-500 dark:text-neutral-500">Generating contextual MCQs to test your knowledge.</p>
             </div>
         );
     }
@@ -145,14 +145,14 @@ export function QuizEngine() {
     if (quizData && currentQuestionIdx >= quizData.length) {
         const finalScore = Object.values(answers).filter((a) => a.isCorrect).length;
         return (
-            <Card className="w-full max-w-2xl mx-auto bg-neutral-900 border-neutral-800 text-neutral-100 shadow-xl overflow-hidden glassmorphism">
+            <Card className="w-full max-w-2xl mx-auto bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-xl overflow-hidden glassmorphism transition-colors">
                 <CardContent className="flex flex-col items-center p-12 space-y-8">
-                    <Brain className="w-24 h-24 text-indigo-400" />
-                    <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-indigo-500">
+                    <Brain className="w-24 h-24 text-indigo-500 dark:text-indigo-400" />
+                    <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-indigo-600 dark:from-teal-400 dark:to-indigo-500">
                         Quiz Completed!
                     </h2>
-                    <div className="text-xl">
-                        You scored <span className="font-bold text-emerald-400">{finalScore}</span> out of {quizData.length}
+                    <div className="text-xl text-neutral-800 dark:text-neutral-100">
+                        You scored <span className="font-bold text-emerald-500 dark:text-emerald-400">{finalScore}</span> out of {quizData.length}
                     </div>
                     <Button onClick={resetQuiz} className="bg-indigo-600 hover:bg-indigo-700 w-full max-w-sm mt-4">
                         Upload Another Document
@@ -172,17 +172,17 @@ export function QuizEngine() {
 
         return (
             <div className="w-full max-w-3xl mx-auto">
-                <div className="w-full flex items-center justify-between mb-4 text-sm font-medium text-neutral-400">
+                <div className="w-full flex items-center justify-between mb-4 text-sm font-medium text-neutral-500 dark:text-neutral-400">
                     <span>Question {currentQuestionIdx + 1} of {quizData.length}</span>
                     <span className="flex items-center gap-2">
                         {q.type === "in_and_around" ? (
-                            <span className="text-amber-400 bg-amber-400/10 px-2 py-1 rounded-md flex items-center gap-1"><Brain size={14} /> In & Around</span>
+                            <span className="text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-400/10 px-2 py-1 rounded-md flex items-center gap-1"><Brain size={14} /> In & Around</span>
                         ) : (
-                            <span className="text-blue-400 bg-blue-400/10 px-2 py-1 rounded-md flex items-center gap-1"><BookOpen size={14} /> Text Based</span>
+                            <span className="text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-400/10 px-2 py-1 rounded-md flex items-center gap-1"><BookOpen size={14} /> Text Based</span>
                         )}
                     </span>
                 </div>
-                <Progress value={progressVal} className="h-2 mb-8 bg-neutral-800" indicatorClass="bg-indigo-500" />
+                <Progress value={progressVal} className="h-2 mb-8 bg-neutral-200 dark:bg-neutral-800" indicatorClass="bg-indigo-500" />
 
                 <AnimatePresence mode="wait">
                     <motion.div
@@ -192,7 +192,7 @@ export function QuizEngine() {
                         exit={{ opacity: 0, y: -20 }}
                         transition={{ duration: 0.3 }}
                     >
-                        <Card className="bg-neutral-900/50 backdrop-blur-xl border-neutral-800 text-neutral-100 shadow-2xl p-4 md:p-6 relative group overflow-hidden">
+                        <Card className="bg-white/80 dark:bg-neutral-900/50 backdrop-blur-xl border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-xl dark:shadow-2xl p-4 md:p-6 relative group overflow-hidden transition-colors">
                             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none" />
                             <CardTitle className="text-lg md:text-xl leading-relaxed mb-4 font-semibold">
                                 {q.question}
@@ -200,15 +200,15 @@ export function QuizEngine() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {q.options.map((opt, idx) => {
-                                    let buttonStateClass = "bg-neutral-800 border-neutral-700 hover:bg-neutral-700 hover:border-neutral-500";
+                                    let buttonStateClass = "bg-neutral-100 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-500";
 
                                     if (showExplanation) {
                                         if (opt.is_correct) {
-                                            buttonStateClass = "bg-emerald-500/20 border-emerald-500 text-emerald-100";
+                                            buttonStateClass = "bg-emerald-100 dark:bg-emerald-500/20 border-emerald-500 text-emerald-700 dark:text-emerald-100";
                                         } else if (idx === selectedOption) {
-                                            buttonStateClass = "bg-red-500/20 border-red-500 text-red-100";
+                                            buttonStateClass = "bg-red-100 dark:bg-red-500/20 border-red-500 text-red-700 dark:text-red-100";
                                         } else {
-                                            buttonStateClass = "bg-neutral-800/50 border-neutral-800 opacity-50";
+                                            buttonStateClass = "bg-neutral-100/50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-800 opacity-50";
                                         }
                                     }
 
@@ -234,9 +234,9 @@ export function QuizEngine() {
                                 <motion.div
                                     initial={{ opacity: 0, height: 0 }}
                                     animate={{ opacity: 1, height: "auto" }}
-                                    className="mt-4 p-4 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-100"
+                                    className="mt-4 p-4 rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-900 dark:text-indigo-100 transition-colors"
                                 >
-                                    <div className="flex items-center gap-2 mb-2 font-bold text-indigo-300 text-sm">
+                                    <div className="flex items-center gap-2 mb-2 font-bold text-indigo-600 dark:text-indigo-300 text-sm">
                                         <Brain className="w-4 h-4" /> Learn More:
                                     </div>
                                     <p className="leading-relaxed text-sm">{q.explanation}</p>
@@ -248,7 +248,7 @@ export function QuizEngine() {
                                     onClick={prevQuestion}
                                     disabled={currentQuestionIdx === 0}
                                     variant="outline"
-                                    className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white flex items-center gap-2 px-4 md:px-6"
+                                    className="border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white flex items-center gap-2 px-4 md:px-6 transition-colors"
                                 >
                                     <ArrowLeft className="w-4 h-4 mr-1" /> Previous
                                 </Button>
@@ -275,36 +275,36 @@ export function QuizEngine() {
                 {...getRootProps()}
                 className={cn(
                     "border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group",
-                    isDragActive ? "border-indigo-400 bg-indigo-400/10 scale-105" : "border-neutral-700 bg-neutral-900 hover:border-indigo-500 hover:bg-neutral-800"
+                    isDragActive ? "border-indigo-400 bg-indigo-50 dark:bg-indigo-400/10 scale-105" : "border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-neutral-50 dark:hover:bg-neutral-800"
                 )}
             >
                 <input {...getInputProps()} />
-                <div className="p-3 rounded-full bg-neutral-800 group-hover:bg-indigo-500/20 mb-3 transition-colors">
-                    <UploadCloud className="w-8 h-8 text-neutral-400 group-hover:text-indigo-400 transition-colors" />
+                <div className="p-3 rounded-full bg-neutral-100 dark:bg-neutral-800 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 mb-3 transition-colors">
+                    <UploadCloud className="w-8 h-8 text-neutral-400 dark:text-neutral-400 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors" />
                 </div>
-                <p className="text-lg font-medium text-neutral-300 text-center">
+                <p className="text-lg font-medium text-neutral-600 dark:text-neutral-300 text-center">
                     {isDragActive ? "Drop the document here..." : "Drag & drop your study material (PDF, DOCX, DOC)"}
                 </p>
-                <p className="text-sm text-neutral-500 mt-2">Maximum file size: 10MB.</p>
+                <p className="text-sm text-neutral-400 dark:text-neutral-500 mt-2">Maximum file size: 10MB.</p>
 
                 {file && (
-                    <div className="mt-6 p-4 bg-indigo-500/20 border border-indigo-500/50 rounded-xl flex items-center gap-3">
-                        <BookOpen className="text-indigo-400" />
-                        <span className="font-semibold text-indigo-200">{file.name}</span>
+                    <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/50 rounded-xl flex items-center gap-3 transition-colors">
+                        <BookOpen className="text-indigo-600 dark:text-indigo-400" />
+                        <span className="font-semibold text-indigo-900 dark:text-indigo-200">{file.name}</span>
                     </div>
                 )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-neutral-900/50 p-6 rounded-3xl border border-neutral-800 backdrop-blur-sm">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white dark:bg-neutral-900/50 p-6 rounded-3xl border border-neutral-200 dark:border-neutral-800 backdrop-blur-sm transition-colors shadow-sm dark:shadow-none">
                 <div className="space-y-3">
-                    <label className="text-sm font-semibold text-neutral-400 ml-1 flex items-center gap-2">
+                    <label className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 ml-1 flex items-center gap-2">
                         <BookOpen size={16} /> Quiz Strategy {(!file) && "(Disabled w/o Doc)"}
                     </label>
                     <select
                         value={quizType}
                         disabled={!file}
                         onChange={(e) => setQuizType(e.target.value)}
-                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer disabled:opacity-50"
+                        className="w-full bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer disabled:opacity-50"
                     >
                         <option value="mix">Balanced Mix (Default)</option>
                         <option value="text_based">Strictly Fact-Based</option>
@@ -313,7 +313,7 @@ export function QuizEngine() {
                 </div>
 
                 <div className="space-y-3">
-                    <label className="text-sm font-semibold text-neutral-400 ml-1 flex items-center gap-2">
+                    <label className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 ml-1 flex items-center gap-2">
                         <Brain size={16} /> Question Count (Max 50)
                     </label>
                     <input
@@ -322,12 +322,12 @@ export function QuizEngine() {
                         max={50}
                         value={numQuestions}
                         onChange={(e) => setNumQuestions(Math.min(50, Math.max(1, parseInt(e.target.value) || 1)))}
-                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                        className="w-full bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                     />
                 </div>
 
                 <div className="space-y-3">
-                    <label className="text-sm font-semibold text-neutral-400 ml-1 flex items-center gap-2">
+                    <label className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 ml-1 flex items-center gap-2">
                         <Brain size={16} /> Difficulty Level
                     </label>
                     <select
@@ -342,8 +342,8 @@ export function QuizEngine() {
                 </div>
             </div>
 
-            <div className="bg-neutral-900/40 p-5 rounded-3xl border border-neutral-800/80 backdrop-blur-sm">
-                <h3 className="text-sm font-semibold text-neutral-400 mb-4 flex items-center gap-2 px-1">
+            <div className="bg-white dark:bg-neutral-900/40 p-5 rounded-3xl border border-neutral-200 dark:border-neutral-800/80 backdrop-blur-sm transition-colors shadow-sm dark:shadow-none">
+                <h3 className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 mb-4 flex items-center gap-2 px-1">
                     <Globe size={16} /> Current Affairs Targeting (For "Current Affairs" button only)
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -354,7 +354,7 @@ export function QuizEngine() {
                             value={caTopic}
                             onChange={(e) => setCaTopic(e.target.value)}
                             placeholder="All"
-                            className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder-neutral-600"
+                            className="w-full bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder-neutral-400 dark:placeholder-neutral-600"
                         />
                     </div>
                     <div className="space-y-2">
@@ -364,7 +364,7 @@ export function QuizEngine() {
                             value={caLocation}
                             onChange={(e) => setCaLocation(e.target.value)}
                             placeholder="India"
-                            className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder-neutral-600"
+                            className="w-full bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder-neutral-400 dark:placeholder-neutral-600"
                         />
                     </div>
                     <div className="space-y-2">
@@ -375,15 +375,15 @@ export function QuizEngine() {
                                 type="date"
                                 value={caStartDate}
                                 onChange={(e) => setCaStartDate(e.target.value)}
-                                className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-2 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all custom-date-input"
+                                className="w-full bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-200 text-sm rounded-lg px-2 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all custom-date-input"
                             />
-                            <span className="text-neutral-500 self-center">to</span>
+                            <span className="text-neutral-400 dark:text-neutral-500 self-center">to</span>
                             <input
                                 title="End Date"
                                 type="date"
                                 value={caEndDate}
                                 onChange={(e) => setCaEndDate(e.target.value)}
-                                className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-2 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all custom-date-input"
+                                className="w-full bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-200 text-sm rounded-lg px-2 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all custom-date-input"
                             />
                         </div>
                     </div>
@@ -404,7 +404,7 @@ export function QuizEngine() {
                     onClick={() => handleGenerateQuiz(true)}
                     size="lg"
                     variant="outline"
-                    className="border-indigo-500/30 bg-neutral-900/80 hover:bg-indigo-500/10 text-indigo-300 hover:text-indigo-200 text-base font-bold px-8 py-6 shadow-lg transition-all transform hover:scale-105 rounded-xl w-full sm:w-auto"
+                    className="border-indigo-200 dark:border-indigo-500/30 bg-white dark:bg-neutral-900/80 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 hover:text-indigo-700 dark:hover:text-indigo-200 text-base font-bold px-8 py-6 shadow-md dark:shadow-lg transition-all transform hover:scale-105 rounded-xl w-full sm:w-auto"
                 >
                     <Globe className="mr-2 w-5 h-5" /> Quiz on Current Affairs
                 </Button>

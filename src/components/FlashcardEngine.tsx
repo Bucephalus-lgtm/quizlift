@@ -201,8 +201,8 @@ export function FlashcardEngine() {
         return (
             <div className="flex flex-col items-center justify-center py-24 space-y-6">
                 <Loader2 className="w-16 h-16 animate-spin text-indigo-500" />
-                <h3 className="text-xl font-medium text-neutral-300">Summoning AI capabilities...</h3>
-                <p className="text-neutral-500">Generating beautiful flashcards from your text.</p>
+                <h3 className="text-xl font-medium text-neutral-800 dark:text-neutral-300">Summoning AI capabilities...</h3>
+                <p className="text-neutral-500 dark:text-neutral-500">Generating beautiful flashcards from your text.</p>
             </div>
         );
     }
@@ -210,13 +210,13 @@ export function FlashcardEngine() {
     // Flashcards completion screen
     if (flashcards && currentCardIdx >= flashcards.length) {
         return (
-            <Card className="w-full max-w-2xl mx-auto bg-neutral-900 border-neutral-800 text-neutral-100 shadow-xl overflow-hidden glassmorphism">
+            <Card className="w-full max-w-2xl mx-auto bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-xl overflow-hidden glassmorphism transition-colors">
                 <CardContent className="flex flex-col items-center p-12 space-y-8">
-                    <Brain className="w-24 h-24 text-indigo-400" />
-                    <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-indigo-500 text-center">
+                    <Brain className="w-24 h-24 text-indigo-500 dark:text-indigo-400" />
+                    <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-indigo-600 dark:from-teal-400 dark:to-indigo-500 text-center">
                         Flashcards Completed!
                     </h2>
-                    <div className="text-xl text-neutral-400 text-center">
+                    <div className="text-xl text-neutral-600 dark:text-neutral-400 text-center">
                         You've reviewed all {flashcards.length} cards. Great job!
                     </div>
                     <Button onClick={resetFlashcards} className="bg-indigo-600 hover:bg-indigo-700 w-full max-w-sm mt-4">
@@ -234,20 +234,20 @@ export function FlashcardEngine() {
 
         return (
             <div className="w-full max-w-3xl mx-auto">
-                <div className="w-full flex items-center justify-between mb-4 text-sm font-medium text-neutral-400">
+                <div className="w-full flex items-center justify-between mb-4 text-sm font-medium text-neutral-500 dark:text-neutral-400">
                     <span>Card {currentCardIdx + 1} of {flashcards.length}</span>
                     <span className="flex items-center gap-2">
                         <button
                             onClick={() => setIsMuted(!isMuted)}
-                            className="text-neutral-500 hover:text-neutral-300 transition-colors p-1"
+                            className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors p-1"
                             title={isMuted ? "Unmute sounds" : "Mute sounds"}
                         >
                             {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
                         </button>
-                        <span className="text-indigo-400 bg-indigo-400/10 px-2 py-1 rounded-md flex items-center gap-1"><Brain size={14} /> Flashcard Mode</span>
+                        <span className="text-indigo-600 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-400/10 px-2 py-1 rounded-md flex items-center gap-1"><Brain size={14} /> Flashcard Mode</span>
                     </span>
                 </div>
-                <Progress value={progressVal} className="h-2 mb-8 bg-neutral-800" indicatorClass="bg-indigo-500" />
+                <Progress value={progressVal} className="h-2 mb-8 bg-neutral-200 dark:bg-neutral-800" indicatorClass="bg-indigo-500" />
 
                 <div className="relative w-full perspective-1000 mb-8 cursor-pointer group" onClick={() => { if (!isMuted) playFlipSound(); setIsFlipped(!isFlipped); }}>
                     <AnimatePresence mode="wait">
@@ -259,18 +259,18 @@ export function FlashcardEngine() {
                             transition={{ duration: 0.3 }}
                             className="w-full"
                         >
-                            <Card className={cn("w-full min-h-[350px] flex items-center justify-center p-6 md:p-10 border-2 transition-all relative overflow-hidden", isFlipped ? "bg-indigo-900/40 border-indigo-500/50" : "bg-neutral-900/80 border-neutral-700 hover:border-indigo-400")}>
+                            <Card className={cn("w-full min-h-[350px] flex items-center justify-center p-6 md:p-10 border-2 transition-all relative overflow-hidden", isFlipped ? "bg-indigo-50 dark:bg-indigo-900/40 border-indigo-200 dark:border-indigo-500/50" : "bg-white dark:bg-neutral-900/80 border-neutral-200 dark:border-neutral-700 hover:border-indigo-300 dark:hover:border-indigo-400")}>
                                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none" />
 
                                 <div className="flex w-full h-full max-h-[400px] overflow-y-auto justify-center items-center">
                                     <div className="w-full py-8 px-2 flex justify-center items-center">
-                                        <CardTitle className="text-xl md:text-2xl text-center leading-relaxed font-medium text-neutral-100">
+                                        <CardTitle className="text-xl md:text-2xl text-center leading-relaxed font-medium text-neutral-900 dark:text-neutral-100">
                                             {isFlipped ? card.back : card.front}
                                         </CardTitle>
                                     </div>
                                 </div>
 
-                                <div className="absolute font-light bottom-4 right-6 text-xs text-neutral-500 bg-neutral-900/80 px-2 py-1 rounded">
+                                <div className="absolute font-light bottom-4 right-6 text-xs text-neutral-500 bg-neutral-100/80 dark:bg-neutral-900/80 px-2 py-1 rounded">
                                     Click card to flip
                                 </div>
                             </Card>
@@ -283,7 +283,7 @@ export function FlashcardEngine() {
                         onClick={prevCard}
                         disabled={currentCardIdx === 0}
                         variant="outline"
-                        className="border-neutral-700 text-neutral-300 hover:bg-neutral-800 hover:text-white flex items-center gap-2 px-4 md:px-6 z-10"
+                        className="border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white flex items-center gap-2 px-4 md:px-6 z-10 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4 mr-1" /> Previous
                     </Button>
@@ -306,38 +306,38 @@ export function FlashcardEngine() {
                 {...getRootProps()}
                 className={cn(
                     "border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 group",
-                    isDragActive ? "border-indigo-400 bg-indigo-400/10 scale-105" : "border-neutral-700 bg-neutral-900 hover:border-indigo-500 hover:bg-neutral-800"
+                    isDragActive ? "border-indigo-400 bg-indigo-50 dark:bg-indigo-400/10 scale-105" : "border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-neutral-50 dark:hover:bg-neutral-800"
                 )}
             >
                 <input {...getInputProps()} />
-                <div className="p-3 rounded-full bg-neutral-800 group-hover:bg-indigo-500/20 mb-3 transition-colors">
-                    <UploadCloud className="w-8 h-8 text-neutral-400 group-hover:text-indigo-400 transition-colors" />
+                <div className="p-3 rounded-full bg-neutral-100 dark:bg-neutral-800 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 mb-3 transition-colors">
+                    <UploadCloud className="w-8 h-8 text-neutral-400 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors" />
                 </div>
-                <p className="text-lg font-medium text-neutral-300 text-center">
+                <p className="text-lg font-medium text-neutral-600 dark:text-neutral-300 text-center">
                     {isDragActive ? "Drop the document here..." : "Drag & drop your study material (PDF, DOCX, DOC)"}
                 </p>
-                <p className="text-sm text-neutral-500 mt-2">Maximum file size: 10MB.</p>
+                <p className="text-sm text-neutral-400 dark:text-neutral-500 mt-2">Maximum file size: 10MB.</p>
 
                 {file && (
-                    <div className="mt-6 p-4 bg-indigo-500/20 border border-indigo-500/50 rounded-xl flex items-center gap-3">
-                        <BookOpen className="text-indigo-400" />
-                        <span className="font-semibold text-indigo-200">{file.name}</span>
+                    <div className="mt-6 p-4 bg-indigo-50 dark:bg-indigo-500/20 border border-indigo-200 dark:border-indigo-500/50 rounded-xl flex items-center gap-3 transition-colors">
+                        <BookOpen className="text-indigo-600 dark:text-indigo-400" />
+                        <span className="font-semibold text-indigo-900 dark:text-indigo-200">{file.name}</span>
                     </div>
                 )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-neutral-900/50 p-6 rounded-3xl border border-neutral-800 backdrop-blur-sm">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white dark:bg-neutral-900/50 p-6 rounded-3xl border border-neutral-200 dark:border-neutral-800 backdrop-blur-sm transition-colors shadow-sm dark:shadow-none">
                 <div className="space-y-3">
-                    <label className="text-sm font-semibold text-neutral-400 ml-1 flex items-center gap-2">
+                    <label className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 ml-1 flex items-center gap-2">
                         <BookOpen size={16} /> Mode {(!file) && "(Disabled w/o Doc)"}
                     </label>
-                    <div className="w-full bg-neutral-800 border-neutral-700 text-neutral-400 text-sm rounded-lg px-4 py-2 opacity-50 cursor-not-allowed">
+                    <div className="w-full bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-400 dark:text-neutral-500 text-sm rounded-lg px-4 py-2 opacity-50 cursor-not-allowed">
                         Study Flashcards
                     </div>
                 </div>
 
                 <div className="space-y-3">
-                    <label className="text-sm font-semibold text-neutral-400 ml-1 flex items-center gap-2">
+                    <label className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 ml-1 flex items-center gap-2">
                         <Brain size={16} /> Flashcard Count (Max 100)
                     </label>
                     <input
@@ -346,18 +346,18 @@ export function FlashcardEngine() {
                         max={100}
                         value={numFlashcards}
                         onChange={(e) => setNumFlashcards(Math.min(100, Math.max(1, parseInt(e.target.value) || 1)))}
-                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                        className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
                     />
                 </div>
 
                 <div className="space-y-3">
-                    <label className="text-sm font-semibold text-neutral-400 ml-1 flex items-center gap-2">
+                    <label className="text-sm font-semibold text-neutral-600 dark:text-neutral-400 ml-1 flex items-center gap-2">
                         <Brain size={16} /> Difficulty Level
                     </label>
                     <select
                         value={difficulty}
                         onChange={(e) => setDifficulty(e.target.value)}
-                        className="w-full bg-neutral-800 border-neutral-700 text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer"
+                        className="w-full bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-neutral-200 text-sm rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer"
                     >
                         <option value="Easy">Easy</option>
                         <option value="Medium">Medium (Default)</option>
