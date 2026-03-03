@@ -120,9 +120,15 @@ export function FlashcardEngine() {
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
     const [flashcards, setFlashcards] = useState<Flashcard[] | null>(null);
+    const [activeFlashcardQueue, setActiveFlashcardQueue] = useState<Flashcard[]>([]);
 
     const [currentCardIdx, setCurrentCardIdx] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
+
+    // Spaced repetition tracking
+    const [sessionRound, setSessionRound] = useState(1);
+    const [masteredInCurrentRound, setMasteredInCurrentRound] = useState<number[]>([]);
+    const [showRoundSummary, setShowRoundSummary] = useState(false);
 
     // Timer states
     const [flashcardStartTime, setFlashcardStartTime] = useState<number | null>(null);
@@ -163,8 +169,12 @@ export function FlashcardEngine() {
 
             if (res?.data?.status === "success") {
                 setFlashcards(res.data.flashcards);
+                setActiveFlashcardQueue(res.data.flashcards);
                 setFlashcardStartTime(Date.now());
                 setFlashcardDuration(null);
+                setSessionRound(1);
+                setMasteredInCurrentRound([]);
+                setShowRoundSummary(false);
             }
         } catch (error: any) {
             console.error("Failed to generate flashcards", error);
@@ -186,25 +196,64 @@ export function FlashcardEngine() {
         }
     };
 
-    const nextCard = () => {
-        if (!flashcards) return;
-        if (currentCardIdx < flashcards.length - 1) {
+    const markAsDone = () => {
+        setMasteredInCurrentRound(prev => [...prev, currentCardIdx]);
+        handleNextOrFinishRound();
+    };
+
+    const needsReview = () => {
+        handleNextOrFinishRound();
+    };
+
+    const handleNextOrFinishRound = () => {
+        if (currentCardIdx < activeFlashcardQueue.length - 1) {
             setIsFlipped(false);
             setCurrentCardIdx((prev) => prev + 1);
         } else {
-            // End of flashcards
-            setCurrentCardIdx(flashcards.length);
+            // Reached end of current active queue
+            if (flashcardStartTime && activeFlashcardQueue.length - masteredInCurrentRound.length === 0 && sessionRound === 1 && masteredInCurrentRound.length === activeFlashcardQueue.length) {
+                // Perfect on first try!
+                setFlashcardDuration(Date.now() - flashcardStartTime);
+            } else if (flashcardStartTime) {
+                // Or completed all rounds
+                const totalRemaining = activeFlashcardQueue.length - (masteredInCurrentRound.length + 1); // +1 dynamically accounting if we just mastered it above but state hasn't flushed
+                // The logic check happens on state flush, so checking showRoundSummary is safer
+            }
+            setShowRoundSummary(true);
+        }
+    };
+
+    const startNextRound = () => {
+        // Filter out cards marked as mastered
+        const unmasteredCards = activeFlashcardQueue.filter((_, idx) => !masteredInCurrentRound.includes(idx));
+
+        if (unmasteredCards.length === 0) {
+            // Fully completed all!
             if (flashcardStartTime) setFlashcardDuration(Date.now() - flashcardStartTime);
+            setShowRoundSummary(false);
+            setCurrentCardIdx(activeFlashcardQueue.length); // Trigger final completion screen
+        } else {
+            // Start next round with remaining cards
+            setActiveFlashcardQueue(unmasteredCards);
+            setMasteredInCurrentRound([]);
+            setCurrentCardIdx(0);
+            setIsFlipped(false);
+            setSessionRound(prev => prev + 1);
+            setShowRoundSummary(false);
         }
     };
 
     const resetFlashcards = () => {
         setFile(null);
         setFlashcards(null);
+        setActiveFlashcardQueue([]);
         setCurrentCardIdx(0);
         setIsFlipped(false);
         setFlashcardStartTime(null);
         setFlashcardDuration(null);
+        setSessionRound(1);
+        setMasteredInCurrentRound([]);
+        setShowRoundSummary(false);
     };
 
     if (loading) {
@@ -260,14 +309,14 @@ export function FlashcardEngine() {
     }
 
     // Active flashcards screen
-    if (flashcards && currentCardIdx < flashcards.length) {
-        const card = flashcards[currentCardIdx];
-        const progressVal = ((currentCardIdx) / flashcards.length) * 100;
+    if (flashcards && flashcards.length > 0 && currentCardIdx < activeFlashcardQueue.length && !showRoundSummary) {
+        const card = activeFlashcardQueue[currentCardIdx];
+        const progressVal = ((currentCardIdx) / activeFlashcardQueue.length) * 100;
 
         return (
             <div className="w-full max-w-3xl mx-auto">
-                <div className="w-full flex items-center justify-between mb-4 text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                    <span>Card {currentCardIdx + 1} of {flashcards.length}</span>
+                <div className="w-full flex items-center justify-between mb-2 text-sm font-medium text-neutral-500 dark:text-neutral-400">
+                    <span>Card {currentCardIdx + 1} of {activeFlashcardQueue.length} <span className="opacity-60 text-xs ml-1">(Round {sessionRound})</span></span>
                     <span className="flex items-center gap-2">
                         <button
                             onClick={() => setIsMuted(!isMuted)}
@@ -310,23 +359,48 @@ export function FlashcardEngine() {
                     </AnimatePresence>
                 </div>
 
-                <div className="mt-8 flex justify-between items-center w-full">
-                    <Button
-                        onClick={prevCard}
-                        disabled={currentCardIdx === 0}
-                        variant="outline"
-                        className="border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white flex items-center gap-2 px-4 md:px-6 z-10 transition-colors"
-                    >
-                        <ArrowLeft className="w-4 h-4 mr-1" /> Previous
-                    </Button>
-                    <Button
-                        onClick={nextCard}
-                        className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-2 px-4 md:px-6 z-10"
-                    >
-                        {currentCardIdx < flashcards.length - 1 ? "Next" : "Finish"}
-                        <ArrowRight className="w-4 h-4 ml-1" />
-                    </Button>
-                </div>
+                <AnimatePresence>
+                    <div className="mt-8 flex flex-col md:flex-row justify-between items-center gap-4 w-full">
+                        {!isFlipped ? (
+                            <div className="w-full flex justify-between items-center">
+                                <Button
+                                    onClick={prevCard}
+                                    disabled={currentCardIdx === 0}
+                                    variant="outline"
+                                    className="border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white flex items-center gap-2 px-4 md:px-6 z-10 transition-colors"
+                                >
+                                    <ArrowLeft className="w-4 h-4 mr-1" /> Previous
+                                </Button>
+                                <Button
+                                    onClick={() => { if (!isMuted) playFlipSound(); setIsFlipped(true); }}
+                                    className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-2 px-6 md:px-10 z-10 shadow-md"
+                                >
+                                    Reveal Answer
+                                </Button>
+                            </div>
+                        ) : (
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="w-full flex justify-center items-center gap-4"
+                            >
+                                <Button
+                                    onClick={needsReview}
+                                    variant="outline"
+                                    className="flex-1 max-w-[200px] border-amber-200 dark:border-amber-500/30 text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 flex items-center gap-2 py-6 text-base shadow-sm"
+                                >
+                                    Needs Review ❌
+                                </Button>
+                                <Button
+                                    onClick={markAsDone}
+                                    className="flex-1 max-w-[200px] bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-2 py-6 text-base shadow-md"
+                                >
+                                    Got It! ✅
+                                </Button>
+                            </motion.div>
+                        )}
+                    </div>
+                </AnimatePresence>
             </div>
         );
     }
