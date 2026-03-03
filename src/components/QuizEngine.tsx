@@ -32,6 +32,10 @@ export function QuizEngine() {
 
     const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
     const [answers, setAnswers] = useState<Record<number, { selectedIdx: number, isCorrect: boolean }>>({});
+
+    // Timer states
+    const [quizStartTime, setQuizStartTime] = useState<number | null>(null);
+    const [quizDuration, setQuizDuration] = useState<number | null>(null);
     const [numQuestions, setNumQuestions] = useState(10);
     const [quizType, setQuizType] = useState("mix");
     const [difficulty, setDifficulty] = useState("Medium");
@@ -89,6 +93,8 @@ export function QuizEngine() {
 
             if (res?.data?.status === "success") {
                 setQuizData(res.data.quiz);
+                setQuizStartTime(Date.now());
+                setQuizDuration(null);
             }
         } catch (error: any) {
             console.error("Failed to generate quiz", error);
@@ -119,8 +125,11 @@ export function QuizEngine() {
 
     const nextQuestion = () => {
         if (!quizData) return;
-        if (currentQuestionIdx < quizData.length) {
+        if (currentQuestionIdx < quizData.length - 1) {
             setCurrentQuestionIdx((prev) => prev + 1);
+        } else {
+            setCurrentQuestionIdx(quizData.length);
+            if (quizStartTime) setQuizDuration(Date.now() - quizStartTime);
         }
     };
 
@@ -129,6 +138,8 @@ export function QuizEngine() {
         setQuizData(null);
         setCurrentQuestionIdx(0);
         setAnswers({});
+        setQuizStartTime(null);
+        setQuizDuration(null);
     };
 
     if (loading) {
@@ -144,6 +155,16 @@ export function QuizEngine() {
     // Quiz completion screen
     if (quizData && currentQuestionIdx >= quizData.length) {
         const finalScore = Object.values(answers).filter((a) => a.isCorrect).length;
+        const incorrectCount = quizData.length - finalScore;
+        const percentage = ((finalScore / quizData.length) * 100).toFixed(1);
+
+        const formatTime = (ms: number) => {
+            const totalSeconds = Math.floor(ms / 1000);
+            const m = Math.floor(totalSeconds / 60);
+            const s = totalSeconds % 60;
+            return `${m}m ${s}s`;
+        };
+
         return (
             <Card className="w-full max-w-2xl mx-auto bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-xl overflow-hidden glassmorphism transition-colors">
                 <CardContent className="flex flex-col items-center p-12 space-y-8">
@@ -151,9 +172,28 @@ export function QuizEngine() {
                     <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-indigo-600 dark:from-teal-400 dark:to-indigo-500">
                         Quiz Completed!
                     </h2>
-                    <div className="text-xl text-neutral-800 dark:text-neutral-100">
-                        You scored <span className="font-bold text-emerald-500 dark:text-emerald-400">{finalScore}</span> out of {quizData.length}
+
+                    <div className="w-full bg-neutral-50 dark:bg-neutral-800/50 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-700/50 space-y-4">
+                        <div className="flex justify-between items-center border-b border-neutral-200 dark:border-neutral-700 pb-3">
+                            <span className="text-neutral-600 dark:text-neutral-400 font-medium">Time Taken</span>
+                            <span className="font-bold text-lg text-indigo-600 dark:text-indigo-400">
+                                {quizDuration ? formatTime(quizDuration) : "N/A"}
+                            </span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-neutral-200 dark:border-neutral-700 pb-3">
+                            <span className="text-neutral-600 dark:text-neutral-400 font-medium">Score Percentage</span>
+                            <span className="font-bold text-lg text-neutral-800 dark:text-neutral-200">{percentage}%</span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-neutral-200 dark:border-neutral-700 pb-3">
+                            <span className="text-neutral-600 dark:text-neutral-400 font-medium">Correct Answers</span>
+                            <span className="font-bold text-lg text-emerald-600 dark:text-emerald-400">{finalScore}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-neutral-600 dark:text-neutral-400 font-medium">Incorrect Answers</span>
+                            <span className="font-bold text-lg text-red-600 dark:text-red-400">{incorrectCount}</span>
+                        </div>
                     </div>
+
                     <Button onClick={resetQuiz} className="bg-indigo-600 hover:bg-indigo-700 w-full max-w-sm mt-4">
                         Upload Another Document
                     </Button>

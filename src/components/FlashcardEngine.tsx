@@ -123,6 +123,11 @@ export function FlashcardEngine() {
 
     const [currentCardIdx, setCurrentCardIdx] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
+
+    // Timer states
+    const [flashcardStartTime, setFlashcardStartTime] = useState<number | null>(null);
+    const [flashcardDuration, setFlashcardDuration] = useState<number | null>(null);
+
     const [numFlashcards, setNumFlashcards] = useState(10);
     const [difficulty, setDifficulty] = useState("Medium");
     const [isMuted, setIsMuted] = useState(false);
@@ -158,6 +163,8 @@ export function FlashcardEngine() {
 
             if (res?.data?.status === "success") {
                 setFlashcards(res.data.flashcards);
+                setFlashcardStartTime(Date.now());
+                setFlashcardDuration(null);
             }
         } catch (error: any) {
             console.error("Failed to generate flashcards", error);
@@ -187,6 +194,7 @@ export function FlashcardEngine() {
         } else {
             // End of flashcards
             setCurrentCardIdx(flashcards.length);
+            if (flashcardStartTime) setFlashcardDuration(Date.now() - flashcardStartTime);
         }
     };
 
@@ -195,6 +203,8 @@ export function FlashcardEngine() {
         setFlashcards(null);
         setCurrentCardIdx(0);
         setIsFlipped(false);
+        setFlashcardStartTime(null);
+        setFlashcardDuration(null);
     };
 
     if (loading) {
@@ -209,6 +219,13 @@ export function FlashcardEngine() {
 
     // Flashcards completion screen
     if (flashcards && currentCardIdx >= flashcards.length) {
+        const formatTime = (ms: number) => {
+            const totalSeconds = Math.floor(ms / 1000);
+            const m = Math.floor(totalSeconds / 60);
+            const s = totalSeconds % 60;
+            return `${m}m ${s}s`;
+        };
+
         return (
             <Card className="w-full max-w-2xl mx-auto bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-xl overflow-hidden glassmorphism transition-colors">
                 <CardContent className="flex flex-col items-center p-12 space-y-8">
@@ -216,9 +233,24 @@ export function FlashcardEngine() {
                     <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-indigo-600 dark:from-teal-400 dark:to-indigo-500 text-center">
                         Flashcards Completed!
                     </h2>
-                    <div className="text-xl text-neutral-600 dark:text-neutral-400 text-center">
-                        You've reviewed all {flashcards.length} cards. Great job!
+
+                    <div className="w-full bg-neutral-50 dark:bg-neutral-800/50 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-700/50 space-y-4">
+                        <div className="flex justify-between items-center border-b border-neutral-200 dark:border-neutral-700 pb-3">
+                            <span className="text-neutral-600 dark:text-neutral-400 font-medium">Time Taken</span>
+                            <span className="font-bold text-lg text-indigo-600 dark:text-indigo-400">
+                                {flashcardDuration ? formatTime(flashcardDuration) : "N/A"}
+                            </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                            <span className="text-neutral-600 dark:text-neutral-400 font-medium">Cards Reviewed</span>
+                            <span className="font-bold text-lg text-emerald-600 dark:text-emerald-400">{flashcards.length}</span>
+                        </div>
                     </div>
+
+                    <div className="text-xl text-neutral-600 dark:text-neutral-400 text-center mt-2">
+                        Great job reviewing these concepts!
+                    </div>
+
                     <Button onClick={resetFlashcards} className="bg-indigo-600 hover:bg-indigo-700 w-full max-w-sm mt-4">
                         Upload Another Document
                     </Button>
