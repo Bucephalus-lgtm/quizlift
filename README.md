@@ -17,14 +17,14 @@ Unlike standard Q&A systems, QuizLift utilizes a dual-engine questioning strateg
 *   **Conceptual "In & Around" Logic:** Synthesizes the document's core themes to generate questions about related concepts and logical extensions, ensuring a deep conceptual grasp rather than mere rote memorization.
 
 <p align="center">
-  <img src="./public/quiz_active.png" width="48%" alt="Active Quiz Interface" />
-  <img src="./public/flashcard_active.png" width="48%" alt="Interactive Flashcard Interface" />
+  <img src="./public/quiz_active_light.png" width="48%" alt="Active Quiz Interface - Light Mode" />
+  <img src="./public/flashcard_active_dark.png" width="48%" alt="Interactive Flashcard Interface - Dark Mode" />
 </p>
 
 
 ## ✨ Core Features
 1.  **Seamless Document Ingestion:** Instantly process dense reading materials, lecture slides, or technical documentation (PDF, DOCX, DOC) via a drag-and-drop interface.
-2.  **Interactive Study Flashcards:** One-click generation of up to 100 beautifully animated 3D flip-cards optimized for active recall learning.
+2.  **Advanced Spaced Repetition Flashcards:** Generate beautifully animated 3D flip-cards optimized for active recall learning. Includes a 2-round max review system where users can mark cards "Got It! ✅" or flag them "Needs Review ❌", concluding with a final performance summary!
 3.  **Current Affairs / Gov Exam Mode:** Generate highly-relevant questions on Economics, International Relations, National News, and Science & Tech straight from the latest headlines, perfectly suited for government exam preparation.
 4.  **Advanced Current Affairs Targeting:** Take complete control over the AI engine by specifying exact geographic **Locations** (e.g., India vs Global), narrowing down to specific **Topics**, and setting strict **Date Ranges** (defaulting to the past 1 year) to ensure contextually fresh and accurate testing.
 5.  **Scalable Difficulty Levels:** Customize your learning experience by generating Quizzes, Flashcards, and Current Affairs modules at **Easy**, **Medium**, or **Difficult** levels.

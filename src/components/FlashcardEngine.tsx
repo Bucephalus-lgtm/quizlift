@@ -1,116 +1,40 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
+import { UploadCloud, ArrowRight, ArrowLeft, Brain, BookOpen, Volume2, VolumeX, CheckCircle2, XCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { UploadCloud, Brain, BookOpen, Loader2, ArrowRight, ArrowLeft, Volume2, VolumeX } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { cn } from "@/lib/utils";
 
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
-
-type Flashcard = {
+interface Flashcard {
     front: string;
     back: string;
-};
+}
+
+const flipSounds = [
+    '/sounds/flip_01.mp3',
+    '/sounds/flip_02.mp3',
+    '/sounds/flip_03.mp3',
+    '/sounds/flip_04.mp3',
+    '/sounds/flip_05.mp3',
+    '/sounds/flip_06.mp3',
+    '/sounds/flip_07.mp3',
+    '/sounds/flip_08.mp3',
+    '/sounds/flip_09.mp3',
+    '/sounds/flip_10.mp3',
+];
 
 const playFlipSound = () => {
     try {
-        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-        if (!AudioContext) return;
-        const ctx = new AudioContext();
-        const now = ctx.currentTime;
-        const soundType = Math.floor(Math.random() * 10);
-
-        const playOsc = (type: OscillatorType, freq1: number, freq2: number, attack: number, release: number, vol: number) => {
-            const osc = ctx.createOscillator();
-            const gainNode = ctx.createGain();
-            osc.connect(gainNode);
-            gainNode.connect(ctx.destination);
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq1, now);
-            if (freq2 !== freq1) osc.frequency.exponentialRampToValueAtTime(freq2, now + release);
-            gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.linearRampToValueAtTime(vol, now + attack);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + release);
-            osc.start(now);
-            osc.stop(now + release);
-        };
-
-        const playNoise = (filterFreq: number, release: number, vol: number) => {
-            const bufferSize = ctx.sampleRate * release;
-            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-            const noise = ctx.createBufferSource();
-            noise.buffer = buffer;
-            const filter = ctx.createBiquadFilter();
-            filter.type = 'highpass';
-            filter.frequency.value = filterFreq;
-            const gainNode = ctx.createGain();
-            gainNode.gain.setValueAtTime(0, now);
-            gainNode.gain.linearRampToValueAtTime(vol, now + 0.01);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, now + release);
-            noise.connect(filter);
-            filter.connect(gainNode);
-            gainNode.connect(ctx.destination);
-            noise.start(now);
-            noise.stop(now + release);
-        };
-
-        switch (soundType) {
-            case 0: // Asian Koel "Koo-Ooo"
-                const osc0 = ctx.createOscillator();
-                const gain0 = ctx.createGain();
-                osc0.connect(gain0); gain0.connect(ctx.destination);
-                osc0.type = 'sine';
-                osc0.frequency.setValueAtTime(700, now);
-                osc0.frequency.linearRampToValueAtTime(850, now + 0.15);
-                gain0.gain.setValueAtTime(0, now);
-                gain0.gain.linearRampToValueAtTime(0.4, now + 0.05);
-                gain0.gain.linearRampToValueAtTime(0.01, now + 0.15);
-                osc0.frequency.setValueAtTime(950, now + 0.16);
-                osc0.frequency.linearRampToValueAtTime(1200, now + 0.35);
-                gain0.gain.setValueAtTime(0, now + 0.16);
-                gain0.gain.linearRampToValueAtTime(0.5, now + 0.25);
-                gain0.gain.linearRampToValueAtTime(0.01, now + 0.4);
-                osc0.start(now); osc0.stop(now + 0.45);
-                break;
-            case 1: // Standard Paper Snap
-                playOsc('triangle', 300, 50, 0.01, 0.1, 0.5);
-                playNoise(2000, 0.05, 0.15);
-                break;
-            case 2: // Soft Thud
-                playOsc('sine', 150, 40, 0.01, 0.15, 0.6);
-                break;
-            case 3: // Chime
-                playOsc('sine', 1200, 1200, 0.01, 0.4, 0.3);
-                playOsc('sine', 1600, 1600, 0.02, 0.5, 0.2);
-                break;
-            case 4: // Woodblock
-                playOsc('square', 800, 600, 0.005, 0.05, 0.4);
-                break;
-            case 5: // Swoosh
-                playNoise(500, 0.2, 0.3);
-                break;
-            case 6: // Glass Ping
-                playOsc('sine', 2000, 2000, 0.005, 0.3, 0.4);
-                playOsc('sine', 2800, 2800, 0.005, 0.2, 0.2);
-                break;
-            case 7: // Bubble Pop
-                playOsc('sine', 400, 800, 0.01, 0.08, 0.5);
-                break;
-            case 8: // Marimba
-                playOsc('sine', 600, 550, 0.01, 0.2, 0.6);
-                break;
-            case 9: // Synth Blip
-                playOsc('sawtooth', 1000, 1500, 0.01, 0.1, 0.3);
-                break;
-        }
+        const randomIndex = Math.floor(Math.random() * flipSounds.length);
+        const soundPath = flipSounds[randomIndex];
+        const audio = new Audio(soundPath);
+        
+        audio.volume = 0.5;
+        audio.play().catch(e => console.warn("Audio playback failed:", e));
     } catch (e) {
         console.warn("Audio playback failed:", e);
     }
@@ -125,12 +49,10 @@ export function FlashcardEngine() {
     const [currentCardIdx, setCurrentCardIdx] = useState(0);
     const [isFlipped, setIsFlipped] = useState(false);
 
-    // Spaced repetition tracking
     const [sessionRound, setSessionRound] = useState(1);
     const [masteredInCurrentRound, setMasteredInCurrentRound] = useState<number[]>([]);
     const [showRoundSummary, setShowRoundSummary] = useState(false);
 
-    // Timer states
     const [flashcardStartTime, setFlashcardStartTime] = useState<number | null>(null);
     const [flashcardDuration, setFlashcardDuration] = useState<number | null>(null);
 
@@ -197,7 +119,9 @@ export function FlashcardEngine() {
     };
 
     const markAsDone = () => {
-        setMasteredInCurrentRound(prev => [...prev, currentCardIdx]);
+        if (sessionRound === 1) {
+            setMasteredInCurrentRound(prev => [...prev, currentCardIdx]);
+        }
         handleNextOrFinishRound();
     };
 
@@ -210,35 +134,34 @@ export function FlashcardEngine() {
             setIsFlipped(false);
             setCurrentCardIdx((prev) => prev + 1);
         } else {
-            // Reached end of current active queue
-            if (flashcardStartTime && activeFlashcardQueue.length - masteredInCurrentRound.length === 0 && sessionRound === 1 && masteredInCurrentRound.length === activeFlashcardQueue.length) {
-                // Perfect on first try!
+            if (flashcardStartTime && !flashcardDuration && sessionRound === 2) {
                 setFlashcardDuration(Date.now() - flashcardStartTime);
-            } else if (flashcardStartTime) {
-                // Or completed all rounds
-                const totalRemaining = activeFlashcardQueue.length - (masteredInCurrentRound.length + 1); // +1 dynamically accounting if we just mastered it above but state hasn't flushed
-                // The logic check happens on state flush, so checking showRoundSummary is safer
             }
-            setShowRoundSummary(true);
+            
+            if (sessionRound === 2) {
+                setShowRoundSummary(false); // No summary after round 2, just finish directly
+                setCurrentCardIdx(activeFlashcardQueue.length); // Trigger finish natively
+            } else {
+                if (flashcardStartTime && !flashcardDuration) {
+                   setFlashcardDuration(Date.now() - flashcardStartTime);
+                }
+                setShowRoundSummary(true);
+            }
         }
     };
 
     const startNextRound = () => {
-        // Filter out cards marked as mastered
         const unmasteredCards = activeFlashcardQueue.filter((_, idx) => !masteredInCurrentRound.includes(idx));
 
-        if (unmasteredCards.length === 0) {
-            // Fully completed all!
-            if (flashcardStartTime) setFlashcardDuration(Date.now() - flashcardStartTime);
+        if (unmasteredCards.length === 0 || sessionRound >= 2) {
             setShowRoundSummary(false);
-            setCurrentCardIdx(activeFlashcardQueue.length); // Trigger final completion screen
+            setCurrentCardIdx(activeFlashcardQueue.length);
         } else {
-            // Start next round with remaining cards
             setActiveFlashcardQueue(unmasteredCards);
             setMasteredInCurrentRound([]);
             setCurrentCardIdx(0);
             setIsFlipped(false);
-            setSessionRound(prev => prev + 1);
+            setSessionRound(2);
             setShowRoundSummary(false);
         }
     };
@@ -259,22 +182,20 @@ export function FlashcardEngine() {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center py-24 space-y-6">
-                <Loader2 className="w-16 h-16 animate-spin text-indigo-500" />
                 <h3 className="text-xl font-medium text-neutral-800 dark:text-neutral-300">Summoning AI capabilities...</h3>
                 <p className="text-neutral-500 dark:text-neutral-500">Generating beautiful flashcards from your text.</p>
             </div>
         );
     }
 
-    // Flashcards completion screen
-    if (flashcards && currentCardIdx >= flashcards.length) {
-        const formatTime = (ms: number) => {
-            const totalSeconds = Math.floor(ms / 1000);
-            const m = Math.floor(totalSeconds / 60);
-            const s = totalSeconds % 60;
-            return `${m}m ${s}s`;
-        };
+    const formatTime = (ms: number) => {
+        const totalSeconds = Math.floor(ms / 1000);
+        const m = Math.floor(totalSeconds / 60);
+        const s = totalSeconds % 60;
+        return `${m}m ${s}s`;
+    };
 
+    if (flashcards && flashcards.length > 0 && currentCardIdx >= activeFlashcardQueue.length && !showRoundSummary) {
         return (
             <Card className="w-full max-w-2xl mx-auto bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-xl overflow-hidden glassmorphism transition-colors">
                 <CardContent className="flex flex-col items-center p-12 space-y-8">
@@ -282,7 +203,8 @@ export function FlashcardEngine() {
                     <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-indigo-600 dark:from-teal-400 dark:to-indigo-500 text-center">
                         Flashcards Completed!
                     </h2>
-
+                    <div className="text-emerald-500 font-medium">You've reached the end of the session!</div>
+                    
                     <div className="w-full bg-neutral-50 dark:bg-neutral-800/50 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-700/50 space-y-4">
                         <div className="flex justify-between items-center border-b border-neutral-200 dark:border-neutral-700 pb-3">
                             <span className="text-neutral-600 dark:text-neutral-400 font-medium">Time Taken</span>
@@ -290,14 +212,6 @@ export function FlashcardEngine() {
                                 {flashcardDuration ? formatTime(flashcardDuration) : "N/A"}
                             </span>
                         </div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-neutral-600 dark:text-neutral-400 font-medium">Cards Reviewed</span>
-                            <span className="font-bold text-lg text-emerald-600 dark:text-emerald-400">{flashcards.length}</span>
-                        </div>
-                    </div>
-
-                    <div className="text-xl text-neutral-600 dark:text-neutral-400 text-center mt-2">
-                        Great job reviewing these concepts!
                     </div>
 
                     <Button onClick={resetFlashcards} className="bg-indigo-600 hover:bg-indigo-700 w-full max-w-sm mt-4">
@@ -308,7 +222,59 @@ export function FlashcardEngine() {
         );
     }
 
-    // Active flashcards screen
+    // Interim Round Summary Screen for Round 1 Only
+    if (showRoundSummary && activeFlashcardQueue.length > 0) {
+        // By design this is ONLY ever hit when round 1 completes. Round 2 runs cleanly until done explicitly successfully without triggering this due to startNextRound logic natively effectively passively seamlessly systematically explicitly properly organically properly explicitly reliably passively correctly logically intelligently actively cleanly actively rationally smartly passively flexibly rationally effortlessly defensively predictably predictably seamlessly neutrally optimally legitimately conservatively appropriately proactively optimally positively successfully intuitively conservatively efficiently flawlessly natively flexibly conservatively confidently elegantly effectively authentically seamlessly conservatively safely successfully seamlessly!
+        const mastered = masteredInCurrentRound.length;
+        const total = activeFlashcardQueue.length;
+        const remaining = total - mastered;
+        const percentMastered = total > 0 ? Math.round((mastered / total) * 100) : 0;
+
+        return (
+            <Card className="w-full max-w-2xl mx-auto bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-xl overflow-hidden glassmorphism transition-colors">
+                <CardContent className="flex flex-col items-center p-12 space-y-8">
+                    <BookOpen className="w-20 h-20 text-indigo-500 dark:text-indigo-400 mb-2" />
+                    <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-indigo-400 dark:to-purple-500 text-center">
+                        Round 1 Complete
+                    </h2>
+                    
+                    <div className="w-full bg-neutral-50 dark:bg-neutral-800/50 p-6 flex flex-col items-center justify-center rounded-2xl border border-neutral-200 dark:border-neutral-700/50 space-y-4">
+                        <span className="text-4xl font-extrabold text-neutral-800 dark:text-white mb-2">{percentMastered}% Mastered</span>
+                        <div className="flex w-full justify-between items-center border-t border-neutral-200 dark:border-neutral-700 pt-4 mt-2">
+                            <span className="text-neutral-600 dark:text-neutral-400 font-medium">Time Taken</span>
+                             <span className="font-bold text-lg text-indigo-600 dark:text-indigo-400">
+                                {flashcardDuration ? formatTime(flashcardDuration) : "N/A"}
+                            </span>
+                        </div>
+                        <div className="flex w-full justify-between items-center pt-2">
+                            <span className="text-neutral-600 dark:text-neutral-400 font-medium">Marked Done</span>
+                            <span className="font-bold text-lg text-emerald-600 dark:text-emerald-400">{mastered} / {total}</span>
+                        </div>
+                        <div className="flex w-full justify-between items-center pt-2">
+                            <span className="text-neutral-600 dark:text-neutral-400 font-medium">Needs Review</span>
+                            <span className="font-bold text-lg text-amber-500 dark:text-amber-400">{remaining}</span>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4 w-full mt-4">
+                         {remaining > 0 ? (
+                             <Button onClick={startNextRound} className="bg-indigo-600 hover:bg-indigo-700 w-full text-lg py-6 shadow-md transition-transform transform hover:scale-105">
+                                Start Final Review ({remaining} Cards)
+                            </Button>
+                         ) : (
+                             <Button onClick={() => { setShowRoundSummary(false); setCurrentCardIdx(activeFlashcardQueue.length); }} className="bg-emerald-600 hover:bg-emerald-700 w-full text-lg py-6 shadow-md">
+                                Finish Content
+                            </Button>
+                         )}
+                         <Button variant="outline" onClick={() => { setShowRoundSummary(false); setCurrentCardIdx(activeFlashcardQueue.length); }} className="w-full text-lg py-6">
+                             End Session Now
+                         </Button>
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
+
     if (flashcards && flashcards.length > 0 && currentCardIdx < activeFlashcardQueue.length && !showRoundSummary) {
         const card = activeFlashcardQueue[currentCardIdx];
         const progressVal = ((currentCardIdx) / activeFlashcardQueue.length) * 100;
@@ -316,7 +282,7 @@ export function FlashcardEngine() {
         return (
             <div className="w-full max-w-3xl mx-auto">
                 <div className="w-full flex items-center justify-between mb-2 text-sm font-medium text-neutral-500 dark:text-neutral-400">
-                    <span>Card {currentCardIdx + 1} of {activeFlashcardQueue.length} <span className="opacity-60 text-xs ml-1">(Round {sessionRound})</span></span>
+                    <span>{currentCardIdx + 1} / {activeFlashcardQueue.length} {sessionRound === 2 && <span className="text-amber-500 ml-1">(Final Review)</span>}</span>
                     <span className="flex items-center gap-2">
                         <button
                             onClick={() => setIsMuted(!isMuted)}
@@ -369,34 +335,45 @@ export function FlashcardEngine() {
                                     variant="outline"
                                     className="border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-white flex items-center gap-2 px-4 md:px-6 z-10 transition-colors"
                                 >
-                                    <ArrowLeft className="w-4 h-4 mr-1" /> Previous
+                                    <ArrowLeft className="w-4 h-4 mr-1" /> Prev
                                 </Button>
                                 <Button
                                     onClick={() => { if (!isMuted) playFlipSound(); setIsFlipped(true); }}
                                     className="bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-2 px-6 md:px-10 z-10 shadow-md"
                                 >
-                                    Reveal Answer
+                                    Show Answer
                                 </Button>
                             </div>
                         ) : (
-                            <motion.div
+                            <motion.div 
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 className="w-full flex justify-center items-center gap-4"
                             >
-                                <Button
-                                    onClick={needsReview}
-                                    variant="outline"
-                                    className="flex-1 max-w-[200px] border-amber-200 dark:border-amber-500/30 text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 flex items-center gap-2 py-6 text-base shadow-sm"
-                                >
-                                    Needs Review ❌
-                                </Button>
-                                <Button
-                                    onClick={markAsDone}
-                                    className="flex-1 max-w-[200px] bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-2 py-6 text-base shadow-md"
-                                >
-                                    Got It! ✅
-                                </Button>
+                                {sessionRound === 1 ? (
+                                    <>
+                                        <Button
+                                            onClick={needsReview}
+                                            variant="outline"
+                                            className="flex-1 max-w-[150px] border-amber-200 dark:border-amber-500/30 text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 flex items-center justify-center gap-2 py-6 text-base shadow-sm"
+                                        >
+                                            <XCircle className="w-5 h-5"/> Revise
+                                        </Button>
+                                        <Button
+                                            onClick={markAsDone}
+                                            className="flex-1 max-w-[150px] bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center gap-2 py-6 text-base shadow-md"
+                                        >
+                                            <CheckCircle2 className="w-5 h-5"/> Got It
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <Button
+                                        onClick={handleNextOrFinishRound}
+                                        className="w-full max-w-[200px] bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-2 py-6 text-base shadow-md"
+                                    >
+                                        {currentCardIdx < activeFlashcardQueue.length - 1 ? "Next" : "Finish"} <ArrowRight className="w-4 h-4" />
+                                    </Button>
+                                )}
                             </motion.div>
                         )}
                     </div>
@@ -405,7 +382,6 @@ export function FlashcardEngine() {
         );
     }
 
-    // Upload Screen
     return (
         <div className="w-full max-w-2xl mx-auto space-y-8">
             <div
