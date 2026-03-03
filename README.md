@@ -6,8 +6,8 @@
 3. **Current Affairs Mastery**: Generate instant, context-rich quizzes based on major national and international headlines, optimized specifically for government and civil service exams without needing any uploaded materials.
 
 <p align="center">
-  <img src="./public/light_mode_demo.png" width="48%" alt="Quiz Dashboard - Light Mode" />
-  <img src="./public/dark_mode_demo.png" width="48%" alt="Flashcard Dashboard - Dark Mode" />
+  <img src="./public/quiz_dark.png" width="48%" alt="Quiz Dashboard - Dark Mode" />
+  <img src="./public/flashcards_light.png" width="48%" alt="Flashcard Dashboard - Light Mode" />
 </p>
 
 ## 🧠 Advanced AI Logic: Beyond Simple Extraction
