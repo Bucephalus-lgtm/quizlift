@@ -236,8 +236,17 @@ export function QuizEngine() {
                     >
                         <Card className="bg-white/80 dark:bg-neutral-900/50 backdrop-blur-xl border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-neutral-100 shadow-xl dark:shadow-2xl p-4 md:p-6 relative group overflow-hidden transition-colors">
                             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none" />
-                            <CardTitle className="text-lg md:text-xl leading-relaxed mb-4 font-semibold">
-                                {q.question}
+                            <CardTitle className="text-lg md:text-xl leading-relaxed mb-4 font-semibold text-neutral-800 dark:text-neutral-100">
+                                {q.question.split('\n').map((line, i) => {
+                                    if (line.trim().match(/^Statement\s*\d+:/i)) {
+                                        return (
+                                            <div key={i} className="mt-3 ml-2 italic text-neutral-700 dark:text-neutral-300 font-medium bg-neutral-100 dark:bg-neutral-800/50 p-3 rounded-lg border-l-4 border-purple-500 shadow-sm">
+                                                {line.trim()}
+                                            </div>
+                                        );
+                                    }
+                                    return <div key={i} className={i > 0 ? "mt-2" : ""}>{line}</div>;
+                                })}
                             </CardTitle>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
