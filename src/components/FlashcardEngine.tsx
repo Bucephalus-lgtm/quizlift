@@ -14,27 +14,28 @@ interface Flashcard {
     back: string;
 }
 
-const flipSounds = [
-    '/sounds/flip_01.mp3',
-    '/sounds/flip_02.mp3',
-    '/sounds/flip_03.mp3',
-    '/sounds/flip_04.mp3',
-    '/sounds/flip_05.mp3',
-    '/sounds/flip_06.mp3',
-    '/sounds/flip_07.mp3',
-    '/sounds/flip_08.mp3',
-    '/sounds/flip_09.mp3',
-    '/sounds/flip_10.mp3',
-];
-
 const playFlipSound = () => {
     try {
-        const randomIndex = Math.floor(Math.random() * flipSounds.length);
-        const soundPath = flipSounds[randomIndex];
-        const audio = new Audio(soundPath);
-        
-        audio.volume = 0.5;
-        audio.play().catch(e => console.warn("Audio playback failed:", e));
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+
+        const osc = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(500, ctx.currentTime + 0.1);
+
+        gainNode.gain.setValueAtTime(0, ctx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.5, ctx.currentTime + 0.05);
+        gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
+
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + 0.2);
     } catch (e) {
         console.warn("Audio playback failed:", e);
     }
@@ -137,13 +138,13 @@ export function FlashcardEngine() {
             if (flashcardStartTime && !flashcardDuration && sessionRound === 2) {
                 setFlashcardDuration(Date.now() - flashcardStartTime);
             }
-            
+
             if (sessionRound === 2) {
                 setShowRoundSummary(false); // No summary after round 2, just finish directly
                 setCurrentCardIdx(activeFlashcardQueue.length); // Trigger finish natively
             } else {
                 if (flashcardStartTime && !flashcardDuration) {
-                   setFlashcardDuration(Date.now() - flashcardStartTime);
+                    setFlashcardDuration(Date.now() - flashcardStartTime);
                 }
                 setShowRoundSummary(true);
             }
@@ -204,7 +205,7 @@ export function FlashcardEngine() {
                         Flashcards Completed!
                     </h2>
                     <div className="text-emerald-500 font-medium">You've reached the end of the session!</div>
-                    
+
                     <div className="w-full bg-neutral-50 dark:bg-neutral-800/50 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-700/50 space-y-4">
                         <div className="flex justify-between items-center border-b border-neutral-200 dark:border-neutral-700 pb-3">
                             <span className="text-neutral-600 dark:text-neutral-400 font-medium">Time Taken</span>
@@ -237,12 +238,12 @@ export function FlashcardEngine() {
                     <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600 dark:from-indigo-400 dark:to-purple-500 text-center">
                         Round 1 Complete
                     </h2>
-                    
+
                     <div className="w-full bg-neutral-50 dark:bg-neutral-800/50 p-6 flex flex-col items-center justify-center rounded-2xl border border-neutral-200 dark:border-neutral-700/50 space-y-4">
                         <span className="text-4xl font-extrabold text-neutral-800 dark:text-white mb-2">{percentMastered}% Mastered</span>
                         <div className="flex w-full justify-between items-center border-t border-neutral-200 dark:border-neutral-700 pt-4 mt-2">
                             <span className="text-neutral-600 dark:text-neutral-400 font-medium">Time Taken</span>
-                             <span className="font-bold text-lg text-indigo-600 dark:text-indigo-400">
+                            <span className="font-bold text-lg text-indigo-600 dark:text-indigo-400">
                                 {flashcardDuration ? formatTime(flashcardDuration) : "N/A"}
                             </span>
                         </div>
@@ -257,18 +258,18 @@ export function FlashcardEngine() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4 w-full mt-4">
-                         {remaining > 0 ? (
-                             <Button onClick={startNextRound} className="bg-indigo-600 hover:bg-indigo-700 w-full text-lg py-6 shadow-md transition-transform transform hover:scale-105">
+                        {remaining > 0 ? (
+                            <Button onClick={startNextRound} className="bg-indigo-600 hover:bg-indigo-700 w-full text-lg py-6 shadow-md transition-transform transform hover:scale-105">
                                 Start Final Review ({remaining} Cards)
                             </Button>
-                         ) : (
-                             <Button onClick={() => { setShowRoundSummary(false); setCurrentCardIdx(activeFlashcardQueue.length); }} className="bg-emerald-600 hover:bg-emerald-700 w-full text-lg py-6 shadow-md">
+                        ) : (
+                            <Button onClick={() => { setShowRoundSummary(false); setCurrentCardIdx(activeFlashcardQueue.length); }} className="bg-emerald-600 hover:bg-emerald-700 w-full text-lg py-6 shadow-md">
                                 Finish Content
                             </Button>
-                         )}
-                         <Button variant="outline" onClick={() => { setShowRoundSummary(false); setCurrentCardIdx(activeFlashcardQueue.length); }} className="w-full text-lg py-6">
-                             End Session Now
-                         </Button>
+                        )}
+                        <Button variant="outline" onClick={() => { setShowRoundSummary(false); setCurrentCardIdx(activeFlashcardQueue.length); }} className="w-full text-lg py-6">
+                            End Session Now
+                        </Button>
                     </div>
                 </CardContent>
             </Card>
@@ -345,7 +346,7 @@ export function FlashcardEngine() {
                                 </Button>
                             </div>
                         ) : (
-                            <motion.div 
+                            <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 className="w-full flex justify-center items-center gap-4"
@@ -357,13 +358,13 @@ export function FlashcardEngine() {
                                             variant="outline"
                                             className="flex-1 max-w-[150px] border-amber-200 dark:border-amber-500/30 text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10 flex items-center justify-center gap-2 py-6 text-base shadow-sm"
                                         >
-                                            <XCircle className="w-5 h-5"/> Revise
+                                            <XCircle className="w-5 h-5" /> Revise
                                         </Button>
                                         <Button
                                             onClick={markAsDone}
                                             className="flex-1 max-w-[150px] bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center gap-2 py-6 text-base shadow-md"
                                         >
-                                            <CheckCircle2 className="w-5 h-5"/> Got It
+                                            <CheckCircle2 className="w-5 h-5" /> Got It
                                         </Button>
                                     </>
                                 ) : (

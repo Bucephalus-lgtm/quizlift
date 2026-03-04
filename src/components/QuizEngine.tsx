@@ -25,6 +25,46 @@ type MCQ = {
     type: string;
 };
 
+const playQuizSound = (isCorrect: boolean) => {
+    try {
+        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+
+        osc.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        if (isCorrect) {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(440, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(554.37, ctx.currentTime + 0.1);
+            osc.frequency.exponentialRampToValueAtTime(659.25, ctx.currentTime + 0.2);
+
+            gainNode.gain.setValueAtTime(0, ctx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05);
+            gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+
+            osc.start();
+            osc.stop(ctx.currentTime + 0.35);
+        } else {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.2);
+
+            gainNode.gain.setValueAtTime(0, ctx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.05);
+            gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.25);
+
+            osc.start();
+            osc.stop(ctx.currentTime + 0.3);
+        }
+    } catch (e) {
+        console.warn("Audio playback failed:", e);
+    }
+};
+
 export function QuizEngine() {
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
@@ -32,6 +72,7 @@ export function QuizEngine() {
 
     const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
     const [answers, setAnswers] = useState<Record<number, { selectedIdx: number, isCorrect: boolean }>>({});
+    const [floatingEmojis, setFloatingEmojis] = useState<{ id: number, x: number, emoji: string }[]>([]);
 
     // Timer states
     const [quizStartTime, setQuizStartTime] = useState<number | null>(null);
@@ -115,6 +156,22 @@ export function QuizEngine() {
             ...prev,
             [currentQuestionIdx]: { selectedIdx: idx, isCorrect },
         }));
+
+        playQuizSound(isCorrect);
+
+        if (isCorrect) {
+            const emojis = ['🎉', '✨', '🔥', '🏆', '⭐', '🚀'];
+            const newEmojis = Array.from({ length: 15 }).map((_, i) => ({
+                id: Date.now() + i,
+                x: Math.random() * 100,
+                emoji: emojis[Math.floor(Math.random() * emojis.length)]
+            }));
+            setFloatingEmojis(newEmojis);
+
+            setTimeout(() => {
+                setFloatingEmojis([]);
+            }, 2000);
+        }
     };
 
     const prevQuestion = () => {
@@ -211,7 +268,21 @@ export function QuizEngine() {
         const selectedOption = currentAnswer?.selectedIdx;
 
         return (
-            <div className="w-full max-w-3xl mx-auto">
+            <div className="w-full max-w-3xl mx-auto relative">
+                <AnimatePresence>
+                    {floatingEmojis.map(emoji => (
+                        <motion.div
+                            key={emoji.id}
+                            initial={{ opacity: 1, y: '50vh', x: `${emoji.x}vw` }}
+                            animate={{ opacity: 0, y: '-20vh' }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 1.5 + Math.random(), ease: "easeOut" }}
+                            className="fixed text-4xl pointer-events-none z-50 left-0 top-0"
+                        >
+                            {emoji.emoji}
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
                 <div className="w-full flex items-center justify-between mb-4 text-sm font-medium text-neutral-500 dark:text-neutral-400">
                     <span>Question {currentQuestionIdx + 1} of {quizData.length}</span>
                     <span className="flex items-center gap-2">
